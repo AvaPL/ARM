@@ -1,8 +1,5 @@
 from adafruit_servokit import ServoKit
-from serial import Serial
-import os
-import sys
-import time
+from bluetooth import *
 
 servoKit = ServoKit(channels=16)
 servoKit.servo[0].set_pulse_width_range(800, 2200)
@@ -16,6 +13,29 @@ servoKit.servo[2].angle = 110;
 servoKit.servo[3].angle = 90;
 
 exit = False
+
+def establishConnection():
+    global clientSocket
+    print("Waiting for a new connection...")
+    clientSocket, address = serverSocket.accept()
+    print("Accepted a connection from ", address)
+
+
+def readData():
+    try:
+        global exit
+        while not exit:
+            data = clientSocket.recv(16)
+            command = decodeCommand(data)
+            processCommand(command)
+    except BluetoothError:
+        print("Disconnected")
+
+
+def decodeCommand(data):
+    command = data.decode(sys.stdout.encoding)
+    return command.rstrip()
+
 
 def processCommand(command):
     print(command)
@@ -39,19 +59,25 @@ def getNewAngle(servoIndex, sign):
 
 
 def changeAngle(servoIndex, angle):
-    servo = servoKit.servo[servoIndex]
     if 0 <= angle <= 180:
-        servo.angle = angle
+        servoKit.servo[servoIndex].angle = angle
 
+def closeSockets():
+    if 'clientSocket' in globals():
+        clientSocket.close()
+    serverSocket.close()
+    print("Sockets closed")
 
-# os.system("sudo rfcomm watch hci0") TODO: Find a better way to connect.
-serialLocation = "/dev/rfcomm0"
+serverSocket = BluetoothSocket(RFCOMM)
+port = 1
+serverSocket.bind(("", port))
+serverSocket.listen(port)
 
-while not os.path.exists(serialLocation):
-    time.sleep(2)
-
-serial = Serial(serialLocation)
-while not exit:
-    commandBytes = serial.readline()
-    command = commandBytes.decode(sys.stdout.encoding)
-    processCommand(command)
+try:
+    while not exit:  # establish a new connection if the client disconnected
+        establishConnection()
+        readData()
+except KeyboardInterrupt:
+    pass
+finally:
+    closeSockets()
