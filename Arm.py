@@ -1,22 +1,21 @@
 from adafruit_servokit import ServoKit
+from bluetooth import BluetoothError
 
 class Arm:
-    def __init__(self, servoNumber, pulseWidths, angles):
-        self.servoKit = ServoKit(channels=16)
-        for index in servoNumber:
-            servo = self.servoKit.servo[index]
-            servo.set_pulse_width_range(pulseWidths[index])
-            servo.angle = angles[index]
-        self.bluetoothConnection = None
-
-    def setBluetoothConnection(self, bluetoothConnection):
+    def __init__(self, bluetoothConnection, servoNumber, pulseWidths, angles):
         self.bluetoothConnection = bluetoothConnection
+        self.servoKit = ServoKit(channels=16)
+        for index in range(servoNumber):
+            servo = self.servoKit.servo[index]
+            servo.set_pulse_width_range(pulseWidths[index][0], pulseWidths[index][1])
+            servo.angle = angles[index]
 
-    def readCommands(self): # returns True if arm received "exit" command
-                            # and False if client disconnected
+    def readCommands(self):
+        # returns True if arm received "exit" command
+        # and False if client disconnected
         try:
             return self.readUntilExit()
-        except self.bluetoothConnection.BluetoothError:
+        except BluetoothError:
             print("Disconnected")
             return False
 
