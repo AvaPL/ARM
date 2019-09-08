@@ -1,16 +1,16 @@
-package com.pawelcembaluk.armcontroller.ui.share;
+package com.pawelcembaluk.armcontroller.ui.settings;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class ShareViewModel extends ViewModel {
+public class SettingsViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public ShareViewModel() {
+    public SettingsViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is share fragment");
+        mText.setValue("This is settings fragment");
     }
 
     public LiveData<String> getText() {

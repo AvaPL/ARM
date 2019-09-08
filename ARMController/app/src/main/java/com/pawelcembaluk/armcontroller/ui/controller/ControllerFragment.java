@@ -1,4 +1,4 @@
-package com.pawelcembaluk.armcontroller.ui.gallery;
+package com.pawelcembaluk.armcontroller.ui.controller;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,18 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.pawelcembaluk.armcontroller.R;
 
-public class GalleryFragment extends Fragment {
+public class ControllerFragment extends Fragment {
 
-    private GalleryViewModel galleryViewModel;
+    private ControllerViewModel controllerViewModel;
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        galleryViewModel =
-                ViewModelProviders.of(this).get(GalleryViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_gallery, container, false);
-        final TextView textView = root.findViewById(R.id.text_gallery);
-        galleryViewModel.getText().observe(this, new Observer<String>() {
+        controllerViewModel =
+                ViewModelProviders.of(this).get(ControllerViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_controller, container, false);
+        final TextView textView = root.findViewById(R.id.text_controller);
+        controllerViewModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
