@@ -21,5 +21,6 @@
         android:id="@+id/nav_settings"
         android:name="com.pawelcembaluk.armcontroller.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+    </fragment>
 </navigation>
