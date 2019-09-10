@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">ARM Controller</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -9,4 +10,10 @@
     <string name="menu_controller">Controller</string>
     <string name="menu_devices">Devices</string>
     <string name="menu_settings">Settings</string>
+
+    <string name="preference_key_continuous_commands_delay">continuous_commands_delay</string>
+    <string name="preference_title_continuous_commands_delay">Continuous commands delay</string>
+    <string name="preference_key_build_version">build_version</string>
+    <string name="preference_title_build_version">Build version</string>
+    <string name="preference_summary_build_version">0.0.1</string>
 </resources>

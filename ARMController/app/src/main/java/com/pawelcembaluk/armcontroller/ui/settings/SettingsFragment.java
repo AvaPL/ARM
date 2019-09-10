@@ -1,36 +1,57 @@
 package com.pawelcembaluk.armcontroller.ui.settings;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.util.Log;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.NonNull;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SeekBarPreference;
 
-import com.pawelcembaluk.armcontroller.MainActivity;
 import com.pawelcembaluk.armcontroller.R;
 import com.pawelcembaluk.armcontroller.interfaces.DrawerEnabler;
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends PreferenceFragmentCompat {
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.preferences, rootKey);
         setDrawerEnabled(false);
-        View root = inflater.inflate(R.layout.fragment_settings, container, false);
-        TextView textView = root.findViewById(R.id.text_settings);
-        SettingsViewModel settingsViewModel =
-                ViewModelProviders.of(this).get(SettingsViewModel.class);
-        settingsViewModel.getText().observe(this, textView::setText);
-        return root;
+        initializeContinuousCommandsDelay();
     }
+
+    private void initializeContinuousCommandsDelay() {
+        String continuousCommandsDelayKey =
+                getString(R.string.preference_key_continuous_commands_delay);
+        SeekBarPreference continuousCommandsDelay = findPreference(continuousCommandsDelayKey);
+        if (continuousCommandsDelay == null) return;
+        continuousCommandsDelay
+                .setSummary(floorToMultipleOf10(continuousCommandsDelay.getValue()) + " ms");
+        continuousCommandsDelay.setOnPreferenceChangeListener(
+                (preference, newValue) -> {
+                    int flooredValue = floorToMultipleOf10((int) newValue);
+                    continuousCommandsDelay.setValue(flooredValue);
+                    continuousCommandsDelay.setSummary(flooredValue + " ms");
+                    return true;
+                });
+    }
+
+    private int floorToMultipleOf10(int value) {
+        value /= 10;
+        value *= 10;
+        return value;
+    }
+
+//    @Override
+//    public View onCreateView(@NonNull LayoutInflater inflater,
+//                             ViewGroup container, Bundle savedInstanceState) {
+//        View root = inflater.inflate(R.layout.fragment_settings, container, false);
+//        TextView textView = root.findViewById(R.id.text_settings);
+//        SettingsViewModel settingsViewModel =
+//                ViewModelProviders.of(this).get(SettingsViewModel.class);
+//        settingsViewModel.getText().observe(this, textView::setText);
+//        return root;
+//    }
 
     private void setDrawerEnabled(boolean isEnabled) {
         FragmentActivity fragmentActivity = getActivity();
