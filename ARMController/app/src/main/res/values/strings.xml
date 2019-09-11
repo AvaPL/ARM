@@ -11,7 +11,6 @@
     <string name="menu_devices">Devices</string>
     <string name="menu_settings">Settings</string>
 
-    <string name="preference_key_continuous_commands_delay">continuous_commands_delay</string>
     <string name="preference_title_continuous_commands_delay">Continuous commands delay</string>
     <string name="preference_key_build_version">build_version</string>
     <string name="preference_title_build_version">Build version</string>

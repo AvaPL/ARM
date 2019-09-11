@@ -1,7 +1,6 @@
 package com.pawelcembaluk.armcontroller.ui.settings;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.preference.Preference;
@@ -13,27 +12,35 @@ import com.pawelcembaluk.armcontroller.interfaces.DrawerEnabler;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
+    public static final String KEY_CONTINUOUS_COMMANDS_DELAY = "continuous_commands_delay";
+
+    private SeekBarPreference continuousCommandsDelay;
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
-        setDrawerEnabled(false);
+        continuousCommandsDelay = findPreference(KEY_CONTINUOUS_COMMANDS_DELAY);
         initializeContinuousCommandsDelay();
+        setDrawerEnabled(false);
+    }
+
+    private void setDrawerEnabled(boolean isEnabled) {
+        FragmentActivity fragmentActivity = getActivity();
+        if (fragmentActivity instanceof DrawerEnabler)
+            ((DrawerEnabler) fragmentActivity).setDrawerEnabled(isEnabled);
     }
 
     private void initializeContinuousCommandsDelay() {
-        String continuousCommandsDelayKey =
-                getString(R.string.preference_key_continuous_commands_delay);
-        SeekBarPreference continuousCommandsDelay = findPreference(continuousCommandsDelayKey);
-        if (continuousCommandsDelay == null) return;
-        continuousCommandsDelay
-                .setSummary(floorToMultipleOf10(continuousCommandsDelay.getValue()) + " ms");
-        continuousCommandsDelay.setOnPreferenceChangeListener(
-                (preference, newValue) -> {
-                    int flooredValue = floorToMultipleOf10((int) newValue);
-                    continuousCommandsDelay.setValue(flooredValue);
-                    continuousCommandsDelay.setSummary(flooredValue + " ms");
-                    return true;
-                });
+        String summary = getSummary(continuousCommandsDelay.getValue());
+        continuousCommandsDelay.setSummary(summary);
+        Preference.OnPreferenceChangeListener continuousCommandsDelayListener =
+                getContinuousCommandsDelayListener();
+        continuousCommandsDelay.setOnPreferenceChangeListener(continuousCommandsDelayListener);
+    }
+
+    private String getSummary(int value) {
+        int flooredValue = floorToMultipleOf10(value);
+        return flooredValue + " ms";
     }
 
     private int floorToMultipleOf10(int value) {
@@ -42,25 +49,17 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         return value;
     }
 
-//    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater,
-//                             ViewGroup container, Bundle savedInstanceState) {
-//        View root = inflater.inflate(R.layout.fragment_settings, container, false);
-//        TextView textView = root.findViewById(R.id.text_settings);
-//        SettingsViewModel settingsViewModel =
-//                ViewModelProviders.of(this).get(SettingsViewModel.class);
-//        settingsViewModel.getText().observe(this, textView::setText);
-//        return root;
-//    }
-
-    private void setDrawerEnabled(boolean isEnabled) {
-        FragmentActivity fragmentActivity = getActivity();
-        if (fragmentActivity instanceof DrawerEnabler)
-            ((DrawerEnabler) fragmentActivity).setDrawerEnabled(isEnabled);
+    private Preference.OnPreferenceChangeListener getContinuousCommandsDelayListener() {
+        return (preference, newValue) -> {
+            String summary = getSummary((int) newValue);
+            continuousCommandsDelay.setSummary(summary);
+            return true;
+        };
     }
 
     @Override
     public void onDestroyView() {
+        continuousCommandsDelay.setValue(floorToMultipleOf10(continuousCommandsDelay.getValue()));
         setDrawerEnabled(true);
         super.onDestroyView();
     }
