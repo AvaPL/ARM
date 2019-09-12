@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -19,61 +20,103 @@
 
     <ImageButton
             android:id="@+id/button_up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_width="@dimen/dpad_size_button"
+            android:layout_height="@dimen/dpad_size_button"
+            android:layout_marginBottom="@dimen/dpad_spacing"
             android:contentDescription="@string/image_description_up_arrow"
-            app:layout_constraintBottom_toTopOf="@+id/dpad_center"
-            app:layout_constraintEnd_toEndOf="@+id/dpad_center"
-            app:layout_constraintStart_toStartOf="@+id/dpad_center"
+            app:layout_constraintBottom_toTopOf="@+id/guideline_horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:srcCompat="@drawable/ic_controller_arrow_up" />
 
     <ImageButton
             android:id="@+id/button_down"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_width="@dimen/dpad_size_button"
+            android:layout_height="@dimen/dpad_size_button"
+            android:layout_marginTop="@dimen/dpad_spacing"
             android:contentDescription="@string/image_description_down_arrow"
-            app:layout_constraintEnd_toEndOf="@+id/dpad_center"
-            app:layout_constraintStart_toStartOf="@+id/dpad_center"
-            app:layout_constraintTop_toBottomOf="@+id/dpad_center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline_horizontal"
             app:srcCompat="@drawable/ic_controller_arrow_down" />
 
     <ImageButton
             android:id="@+id/button_left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
+            android:layout_width="@dimen/dpad_size_button"
+            android:layout_height="@dimen/dpad_size_button"
+            android:layout_marginEnd="@dimen/dpad_spacing"
             android:contentDescription="@string/image_description_left_arrow"
-            app:layout_constraintBottom_toBottomOf="@+id/dpad_center"
-            app:layout_constraintEnd_toStartOf="@+id/dpad_center"
-            app:layout_constraintTop_toTopOf="@+id/dpad_center"
-            app:layout_constraintVertical_bias="0.488"
+            app:layout_constraintBottom_toTopOf="@+id/button_down"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_vertical"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_up"
             app:srcCompat="@drawable/ic_controller_arrow_left" />
 
     <ImageButton
             android:id="@+id/button_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_width="@dimen/dpad_size_button"
+            android:layout_height="@dimen/dpad_size_button"
+            android:layout_marginStart="@dimen/dpad_spacing"
             android:contentDescription="@string/image_description_right_arrow"
-            app:layout_constraintBottom_toBottomOf="@+id/dpad_center"
-            app:layout_constraintStart_toEndOf="@+id/dpad_center"
-            app:layout_constraintTop_toTopOf="@+id/dpad_center"
-            app:layout_constraintVertical_bias="0.488"
+            app:layout_constraintBottom_toTopOf="@+id/button_down"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline_vertical"
+            app:layout_constraintTop_toBottomOf="@+id/button_up"
             app:srcCompat="@drawable/ic_controller_arrow_right" />
 
-    <Space
-            android:id="@+id/dpad_center"
+    <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.75" />
+
+    <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+
+    <SeekBar
+            android:id="@+id/seek_bar_joint_0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="32dp"
             android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/seek_bar_joint_1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.75" />
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <SeekBar
+            android:id="@+id/seek_bar_joint_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/seek_bar_joint_2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/seek_bar_joint_0" />
+
+    <SeekBar
+            android:id="@+id/seek_bar_joint_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/button_up"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/seek_bar_joint_1" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
