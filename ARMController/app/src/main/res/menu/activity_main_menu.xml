@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+            android:id="@+id/raspberry_pi"
+            android:icon="@drawable/ic_raspberry_pi"
+            android:title="@string/title_connect_to_rpi"
+            app:iconTint="@color/colorIcons"
+            app:showAsAction="always" />
+</menu>
