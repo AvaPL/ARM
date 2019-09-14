@@ -20,4 +20,7 @@
     <string name="image_description_right_arrow">Right arrow</string>
     <string name="image_description_up_arrow">Up arrow</string>
     <string name="image_description_left_arrow">Left arrow</string>
+
+    <string name="text_release">RELEASE</string>
+    <string name="text_grab">GRAB</string>
 </resources>
