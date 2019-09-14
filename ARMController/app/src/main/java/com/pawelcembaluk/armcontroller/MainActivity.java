@@ -1,9 +1,14 @@
 package com.pawelcembaluk.armcontroller;
 
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -19,8 +24,11 @@ import com.pawelcembaluk.armcontroller.ui.settings.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity implements DrawerEnabler {
 
+    private static final String KEY_IS_CONNECTED = "is_connected";
+
     private AppBarConfiguration mAppBarConfiguration;
     private DrawerLayout mDrawer;
+    private boolean isConnected = false; //TODO: Placeholder, replace with calls to Bluetooth class.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler {
         initializeToolbar();
         initializeNavigation();
         readSettings();
+        loadInstanceState(savedInstanceState);
     }
 
     private void initializeToolbar() {
@@ -54,11 +63,48 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler {
                 SettingsFragment.KEY_CONTINUOUS_COMMANDS_DELAY, 50)); //TODO: Use this setting.
     }
 
+    private void loadInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState == null) return;
+        isConnected = savedInstanceState.getBoolean(KEY_IS_CONNECTED);
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) ||
                super.onSupportNavigateUp();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main_menu, menu);
+        Drawable raspberryPiIcon = menu.getItem(0).getIcon();
+        setIconColorByConnectionStatus(raspberryPiIcon);
+        return true;
+    }
+
+    private void setIconColorByConnectionStatus(Drawable raspberryPiIcon) {
+        int activeColor = getColor(R.color.colorIcons);
+        int inactiveIconColor = getColor(R.color.colorIconsInactive);
+        raspberryPiIcon.setTint(isConnected ? activeColor : inactiveIconColor);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.raspberry_pi) {
+            isConnected = !isConnected;
+            Drawable raspberryPiIcon = item.getIcon();
+            setIconColorByConnectionStatus(raspberryPiIcon);
+            String connectionText = isConnected ? "Connected to RPi" : "Disconnected from RPi";
+            Toast.makeText(getApplicationContext(), connectionText, Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(KEY_IS_CONNECTED, isConnected);
+        super.onSaveInstanceState(outState);
     }
 
     @Override

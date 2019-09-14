@@ -7,4 +7,5 @@
     <color name="colorText">#E0E0E0</color>
     <color name="colorTextSecondary">#9E9E9E</color>
     <color name="colorIcons">#E0E0E0</color>
+    <color name="colorIconsInactive">#9E9E9E</color>
 </resources>
