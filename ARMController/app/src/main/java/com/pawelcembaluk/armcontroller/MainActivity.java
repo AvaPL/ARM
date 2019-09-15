@@ -1,5 +1,6 @@
 package com.pawelcembaluk.armcontroller;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -26,18 +27,18 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler {
 
     private static final String KEY_IS_CONNECTED = "is_connected";
 
-    private AppBarConfiguration mAppBarConfiguration;
-    private DrawerLayout mDrawer;
+    private AppBarConfiguration appBarConfiguration;
+    private DrawerLayout drawer;
     private boolean isConnected = false; //TODO: Placeholder, replace with calls to Bluetooth class.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mDrawer = findViewById(R.id.drawer_layout);
-        mAppBarConfiguration =
+        drawer = findViewById(R.id.drawer_layout);
+        appBarConfiguration =
                 new AppBarConfiguration.Builder(R.id.nav_controller, R.id.nav_devices)
-                        .setDrawerLayout(mDrawer).build();
+                        .setDrawerLayout(drawer).build();
         initializeToolbar();
         initializeNavigation();
         readSettings();
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler {
     private void initializeNavigation() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
     }
 
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler {
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        return NavigationUI.navigateUp(navController, mAppBarConfiguration) ||
+        return NavigationUI.navigateUp(navController, appBarConfiguration) ||
                super.onSupportNavigateUp();
     }
 
@@ -91,14 +92,30 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.raspberry_pi) {
-            isConnected = !isConnected;
-            Drawable raspberryPiIcon = item.getIcon();
-            setIconColorByConnectionStatus(raspberryPiIcon);
-            String connectionText = isConnected ? "Connected to RPi" : "Disconnected from RPi";
-            Toast.makeText(getApplicationContext(), connectionText, Toast.LENGTH_SHORT).show();
+        switch (item.getItemId()) {
+            case R.id.raspberry_pi:
+                return connectToRaspberryPi(item);
+            case R.id.bluetooth_settings:
+                return showBluetoothSettings();
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    private boolean connectToRaspberryPi(@NonNull MenuItem item) {
+        isConnected = !isConnected;
+        Drawable raspberryPiIcon = item.getIcon();
+        setIconColorByConnectionStatus(raspberryPiIcon);
+        String connectionText = isConnected ? "Connected to RPi" : "Disconnected from RPi";
+        Toast.makeText(getApplicationContext(), connectionText, Toast.LENGTH_SHORT).show();
+        return true;
+    }
+
+    private boolean showBluetoothSettings() {
+        Intent intent = new Intent();
+        intent.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+        startActivity(intent);
+        return true;
     }
 
     @Override
@@ -109,9 +126,9 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler {
 
     @Override
     public void setDrawerEnabled(boolean isEnabled) {
-        if (mDrawer == null) return;
+        if (drawer == null) return;
         int lockMode =
                 isEnabled ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
-        mDrawer.setDrawerLockMode(lockMode);
+        drawer.setDrawerLockMode(lockMode);
     }
 }
