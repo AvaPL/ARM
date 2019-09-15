@@ -30,13 +30,11 @@ public class ControllerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        Log.d(getClass().getSimpleName(), "Inflating view");
         return inflater.inflate(R.layout.fragment_controller, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Log.d(getClass().getSimpleName(), "View created.");
         initializeSeekBars();
         initializeJointTextViews();
         initializeAnglesSharedPreferences();
