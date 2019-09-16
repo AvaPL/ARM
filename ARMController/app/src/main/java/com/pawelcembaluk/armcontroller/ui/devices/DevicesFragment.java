@@ -16,11 +16,11 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.ListFragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.pawelcembaluk.armcontroller.BluetoothConnection;
+import com.pawelcembaluk.armcontroller.bluetooth.BluetoothConnection;
+import com.pawelcembaluk.armcontroller.bluetooth.Devices;
 import com.pawelcembaluk.armcontroller.R;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class DevicesFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -95,16 +95,11 @@ public class DevicesFragment extends ListFragment implements SwipeRefreshLayout.
 
     private void refreshDevices() {
         bluetoothDevices.clear();
-        BluetoothConnection.getBondedDevices().stream().filter(BluetoothConnection::isNotLE)
-                           .sorted(this::compareDevices).forEach(bluetoothDevices::add);
+        BluetoothConnection.getBondedDevices().stream().filter(Devices::isNotLE)
+                           .sorted(Devices::compare).forEach(bluetoothDevices::add);
         devicesArrayAdapter.notifyDataSetChanged();
     }
 
-    private int compareDevices(BluetoothDevice device1, BluetoothDevice device2) {
-        if (Objects.equals(device1.getName(), device2.getName()))
-            return device1.getAddress().compareTo(device2.getAddress());
-        return device1.getName().compareTo(device2.getName());
-    }
 
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
