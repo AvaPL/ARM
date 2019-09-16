@@ -19,4 +19,8 @@ public class BluetoothConnection {
         return BluetoothAdapter.getDefaultAdapter().getBondedDevices().stream().filter(isNotLe)
                                .collect(Collectors.toSet());
     }
+
+    public static boolean isNotLE(BluetoothDevice bluetoothDevice){
+        return bluetoothDevice.getType() != BluetoothDevice.DEVICE_TYPE_LE;
+    }
 }

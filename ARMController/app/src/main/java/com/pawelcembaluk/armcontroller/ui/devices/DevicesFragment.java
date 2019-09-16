@@ -3,7 +3,10 @@ package com.pawelcembaluk.armcontroller.ui.devices;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -11,13 +14,15 @@ import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.ListFragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.pawelcembaluk.armcontroller.BluetoothConnection;
 import com.pawelcembaluk.armcontroller.R;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class DevicesFragment extends ListFragment {
+public class DevicesFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private ArrayList<BluetoothDevice> bluetoothDevices = new ArrayList<>();
     private BluetoothDeviceArrayAdapter devicesArrayAdapter;
@@ -30,10 +35,28 @@ public class DevicesFragment extends ListFragment {
     }
 
 //    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater,
-//                             ViewGroup container, Bundle savedInstanceState) {
-//        return inflater.inflate(R.layout.fragment_devices, container, false);
-//    }
+////    public View onCreateView(@NonNull LayoutInflater inflater,
+////                             ViewGroup container, Bundle savedInstanceState) {
+////        return inflater.inflate(R.layout.fragment_devices, container, false);
+////    }
+
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        ViewGroup parent =
+                (ViewGroup) inflater.inflate(R.layout.fragment_devices, container, false);
+        parent.addView(view, 0);
+        setRefreshListener(parent);
+        return parent;
+    }
+
+    private void setRefreshListener(ViewGroup parent) {
+        if (parent instanceof SwipeRefreshLayout)
+            ((SwipeRefreshLayout) parent).setOnRefreshListener(this);
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -55,8 +78,12 @@ public class DevicesFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        setNoDevicesText();
         refresh();
+    }
+
+    private void refresh() {
+        setNoDevicesText();
+        refreshDevices();
     }
 
     private void setNoDevicesText() {
@@ -65,17 +92,30 @@ public class DevicesFragment extends ListFragment {
         setEmptyText(getString(stringResourceId));
     }
 
-    private void refresh() {
+
+    private void refreshDevices() {
         bluetoothDevices.clear();
-        for (BluetoothDevice device : BluetoothConnection.getBondedDevices())
-            if (device.getType() != BluetoothDevice.DEVICE_TYPE_LE)
-                bluetoothDevices.add(device);
-//        Collections.sort(bluetoothDevices, DevicesFragment::compareTo); TODO: Add sorting method.
+        BluetoothConnection.getBondedDevices().stream().filter(BluetoothConnection::isNotLE)
+                           .sorted(this::compareDevices).forEach(bluetoothDevices::add);
         devicesArrayAdapter.notifyDataSetChanged();
+    }
+
+    private int compareDevices(BluetoothDevice device1, BluetoothDevice device2) {
+        if (Objects.equals(device1.getName(), device2.getName()))
+            return device1.getAddress().compareTo(device2.getAddress());
+        return device1.getName().compareTo(device2.getName());
     }
 
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
         Toast.makeText(getContext(), "Item selected", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRefresh() {
+        Log.d(getClass().getSimpleName(), "onRefresh");
+        refresh();
+        if (getView() instanceof SwipeRefreshLayout)
+            ((SwipeRefreshLayout) getView()).setRefreshing(false);
     }
 }
