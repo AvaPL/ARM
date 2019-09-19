@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 public class BluetoothConnection {
 
+    public static String deviceAddress; //TODO: Replace with singleton, move connection here if possible.
+
     public static boolean isEnabled() {
         return BluetoothAdapter.getDefaultAdapter().isEnabled();
     }

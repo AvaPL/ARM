@@ -34,13 +34,6 @@ public class DevicesFragment extends ListFragment implements SwipeRefreshLayout.
         devicesArrayAdapter = new BluetoothDeviceArrayAdapter(getActivity(), bluetoothDevices);
     }
 
-//    @Override
-////    public View onCreateView(@NonNull LayoutInflater inflater,
-////                             ViewGroup container, Bundle savedInstanceState) {
-////        return inflater.inflate(R.layout.fragment_devices, container, false);
-////    }
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -61,7 +54,6 @@ public class DevicesFragment extends ListFragment implements SwipeRefreshLayout.
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        setListAdapter(null); //TODO: Is this line needed?
         if (getActivity() == null) return;
         View header = inflateListHeader(getActivity());
         getListView().addHeaderView(header, null, false);
@@ -103,12 +95,13 @@ public class DevicesFragment extends ListFragment implements SwipeRefreshLayout.
 
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
-        Toast.makeText(getContext(), "Item selected", Toast.LENGTH_SHORT).show();
+        BluetoothDevice device = bluetoothDevices.get(position-1);
+        BluetoothConnection.deviceAddress = device.getAddress();
+        Log.d(getClass().getSimpleName(), device.getAddress());
     }
 
     @Override
     public void onRefresh() {
-        Log.d(getClass().getSimpleName(), "onRefresh");
         refresh();
         if (getView() instanceof SwipeRefreshLayout)
             ((SwipeRefreshLayout) getView()).setRefreshing(false);
