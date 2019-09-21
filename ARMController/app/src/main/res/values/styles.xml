@@ -10,6 +10,7 @@
         <item name="android:windowBackground">@color/colorBackground</item>
         <item name="android:textColor">@color/colorText</item>
         <item name="android:textColorSecondary">@color/colorTextSecondary</item>
+        <item name="actionOverflowMenuStyle">@style/AppTheme.OverflowMenu</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -20,5 +21,9 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.OverflowMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:popupBackground">@color/colorBackground</item>
+    </style>
 
 </resources>

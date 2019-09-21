@@ -5,15 +5,15 @@
         android:layout_height="match_parent">
 
     <ImageButton
-        android:id="@+id/button_up"
-        android:layout_width="@dimen/dpad_size_button"
-        android:layout_height="@dimen/dpad_size_button"
-        android:layout_marginBottom="@dimen/dpad_spacing"
-        android:contentDescription="@string/image_description_up_arrow"
-        app:layout_constraintBottom_toTopOf="@+id/guideline_horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_controller_arrow_up" />
+            android:id="@+id/button_up"
+            android:layout_width="@dimen/dpad_size_button"
+            android:layout_height="@dimen/dpad_size_button"
+            android:layout_marginBottom="@dimen/dpad_spacing"
+            android:contentDescription="@string/image_description_up_arrow"
+            app:layout_constraintBottom_toTopOf="@+id/guideline_horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_controller_arrow_up" />
 
     <ImageButton
         android:id="@+id/button_down"

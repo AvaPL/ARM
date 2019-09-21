@@ -1,10 +1,7 @@
 <resources>
     <string name="app_name">ARM Controller</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_title">ARM Controller</string>
     <string name="nav_header_desc">Navigation header</string>
 
     <string name="menu_controller">Controller</string>
@@ -23,5 +20,12 @@
 
     <string name="text_release">RELEASE</string>
     <string name="text_grab">GRAB</string>
+    <string name="text_initializing">Initializing…</string>
+    <string name="text_no_devices_found">No Bluetooth devices found.</string>
+    <string name="text_bluetooth_disabled">Bluetooth is disabled.</string>
+
     <string name="title_connect_to_rpi">Connect to RPi</string>
+    <string name="title_bluetooth_settings">Bluetooth settings</string>
+
+    <string name="header_paired_devices">Paired devices</string>
 </resources>

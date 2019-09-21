@@ -3,7 +3,6 @@ package com.pawelcembaluk.armcontroller.ui.controller;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,15 +27,19 @@ public class ControllerFragment extends Fragment {
     private TextView[] jointTextViews;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        Log.d(getClass().getSimpleName(), "Inflating view");
         return inflater.inflate(R.layout.fragment_controller, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Log.d(getClass().getSimpleName(), "View created.");
         initializeSeekBars();
         initializeJointTextViews();
         initializeAnglesSharedPreferences();
