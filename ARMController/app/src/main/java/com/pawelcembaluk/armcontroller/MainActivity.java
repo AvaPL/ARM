@@ -1,6 +1,7 @@
 package com.pawelcembaluk.armcontroller;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -32,6 +33,10 @@ import com.pawelcembaluk.armcontroller.ui.settings.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity implements DrawerEnabler, ServiceConnection, ConnectionObserver {
 
+    private static final String SHARED_PREFERENCES_DEVICES = "devices";
+    private static final String KEY_LAST_DEVICE = "last_device";
+
+    private SharedPreferences devices;
     private AppBarConfiguration appBarConfiguration;
     private DrawerLayout drawer;
     private Drawable RPiIcon;
@@ -40,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler, Se
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        devices = getSharedPreferences(SHARED_PREFERENCES_DEVICES, Context.MODE_PRIVATE);
         drawer = findViewById(R.id.drawer_layout);
         appBarConfiguration =
                 new AppBarConfiguration.Builder(R.id.nav_controller, R.id.nav_devices)
@@ -47,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler, Se
         initializeToolbar();
         initializeNavigation();
         readSettings();
+        loadLastDevice();
         BluetoothConnection.getInstance().addConnectionObserver(this);
     }
 
@@ -75,6 +82,11 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler, Se
                 SettingsFragment.KEY_CONTINUOUS_COMMANDS_DELAY, 50)); //TODO: Use this setting.
     }
 
+    private void loadLastDevice() {
+        String lastDevice = devices.getString(KEY_LAST_DEVICE, null);
+        BluetoothConnection.getInstance().setDeviceAddress(lastDevice);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -90,7 +102,15 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler, Se
     @Override
     protected void onPause() {
         BluetoothConnection.getInstance().unbindService(this, this);
+        saveLastDevice();
         super.onPause();
+    }
+
+    private void saveLastDevice() {
+        SharedPreferences.Editor anglesEditor = devices.edit();
+        String lastDevice = BluetoothConnection.getInstance().getDeviceAddress();
+        anglesEditor.putString(KEY_LAST_DEVICE, lastDevice);
+        anglesEditor.apply();
     }
 
     @Override
@@ -154,14 +174,12 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler, Se
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-        Log.d(getClass().getSimpleName(), "onServiceConnected");
         SerialService service = ((SerialService.SerialBinder) iBinder).getService();
         BluetoothConnection.getInstance().setService(service);
     }
 
     @Override
     public void onServiceDisconnected(ComponentName componentName) {
-        Log.d(getClass().getSimpleName(), "onServiceDisconnected");
         BluetoothConnection.getInstance().setService(null);
     }
 

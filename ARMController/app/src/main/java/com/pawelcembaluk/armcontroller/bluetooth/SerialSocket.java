@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import com.pawelcembaluk.armcontroller.interfaces.SerialListener;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;

@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.pawelcembaluk.armcontroller.interfaces.ConnectionObserver;
 import com.pawelcembaluk.armcontroller.interfaces.DataReceivedObserver;
+import com.pawelcembaluk.armcontroller.interfaces.SerialListener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -63,15 +64,13 @@ public class BluetoothConnection implements SerialListener {
             return;
         }
         if (connected != Connected.False) return;
-        Log.d(getClass().getSimpleName(), "connect");
         try {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             BluetoothDevice device = bluetoothAdapter.getRemoteDevice(deviceAddress);
-            String deviceName = device.getName() != null ? device.getName() : device.getAddress();
             connected = Connected.Pending;
             Toast.makeText(context, "Connecting...", Toast.LENGTH_SHORT).show();
             socket = new SerialSocket();
-            service.connect(this, "Connected to " + deviceName);
+            service.connect(this);
             socket.connect(context, service, device);
         } catch (Exception e) {
             onSerialConnectError(e);
@@ -79,24 +78,18 @@ public class BluetoothConnection implements SerialListener {
     }
 
     public void startService(Activity activity) {
-        Log.d(getClass().getSimpleName(), "startService");
-        if (service != null) {
-            Log.d(getClass().getSimpleName(), "attaching service");
+        if (service != null)
             service.attach(this);
-        } else {
-            Log.d(getClass().getSimpleName(), "starting service");
+        else
             activity.startService(new Intent(activity, SerialService.class));
-        }
     }
 
     public void bindService(Activity activity, ServiceConnection serviceConnection) {
-        Log.d(getClass().getSimpleName(), "bindService");
         activity.bindService(new Intent(activity, SerialService.class), serviceConnection,
                              Context.BIND_AUTO_CREATE);
     }
 
     public void unbindService(Activity activity, ServiceConnection serviceConnection) {
-        Log.d(getClass().getSimpleName(), "unbindService");
         try {
             activity.unbindService(serviceConnection);
         } catch (Exception ignored) {
@@ -104,14 +97,12 @@ public class BluetoothConnection implements SerialListener {
     }
 
     public void detachService(Activity activity) {
-        Log.d(getClass().getSimpleName(), "detachService");
         if (service != null && !activity.isChangingConfigurations())
             service.detach();
     }
 
     @Override
     public void onSerialConnect() {
-        Log.d(getClass().getSimpleName(), "connected (yay!)");
         connected = Connected.True;
         notifyObservers(connectionObservers, ConnectionObserver::onConnect);
     }
@@ -123,7 +114,6 @@ public class BluetoothConnection implements SerialListener {
 
     @Override
     public void onSerialConnectError(Exception e) {
-        Log.d(getClass().getSimpleName(), "connection error");
         cleanConnection();
         notifyObservers(connectionObservers, ConnectionObserver::onConnectionFailed);
     }
@@ -142,13 +132,11 @@ public class BluetoothConnection implements SerialListener {
 
     @Override
     public void onSerialIoError(Exception e) {
-        Log.d(getClass().getSimpleName(), "io error (disconnect)");
         cleanConnection();
         notifyObservers(connectionObservers, ConnectionObserver::onDisconnect);
     }
 
     public void disconnect() {
-        Log.d(getClass().getSimpleName(), "disconnect");
         cleanConnection();
         notifyObservers(connectionObservers, ConnectionObserver::onDisconnect);
     }

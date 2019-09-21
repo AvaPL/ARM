@@ -1,4 +1,4 @@
-package com.pawelcembaluk.armcontroller.bluetooth;
+package com.pawelcembaluk.armcontroller.interfaces;
 
 /**
  *      MIT License

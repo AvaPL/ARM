@@ -2,6 +2,8 @@ package com.pawelcembaluk.armcontroller.ui.devices;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -99,7 +101,6 @@ public class DevicesFragment extends ListFragment implements SwipeRefreshLayout.
         BluetoothDevice device = bluetoothDevices.get(position - 1);
         BluetoothConnection.getInstance().setDeviceAddress(device.getAddress());
         devicesArrayAdapter.notifyDataSetChanged();
-        Log.d(getClass().getSimpleName(), device.getAddress());
     }
 
     @Override
