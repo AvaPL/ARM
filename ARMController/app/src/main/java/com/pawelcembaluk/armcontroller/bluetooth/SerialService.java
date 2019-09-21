@@ -15,27 +15,27 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- *      MIT License
- *
- *      Copyright (c) 2019 Kai Morich
- *
- *      Permission is hereby granted, free of charge, to any person obtaining a copy
- *      of this software and associated documentation files (the "Software"), to deal
- *      in the Software without restriction, including without limitation the rights
- *      to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *      copies of the Software, and to permit persons to whom the Software is
- *      furnished to do so, subject to the following conditions:
- *
- *      The above copyright notice and this permission notice shall be included in all
- *      copies or substantial portions of the Software.
- *
- *      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *      SOFTWARE.
+ * MIT License
+ * <p>
+ * Copyright (c) 2019 Kai Morich
+ * <p>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * <p>
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * <p>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -112,18 +112,18 @@ public class SerialService extends Service implements SerialListener {
         }
         for(QueueItem item : queue1) {
             switch(item.type) {
-                case Connect:       listener.onSerialConnect      (); break;
-                case ConnectError:  listener.onSerialConnectError (item.e); break;
-                case Read:          listener.onSerialRead         (item.data); break;
-                case IoError:       listener.onSerialIoError      (item.e); break;
+                case Connect:       listener.onConnect(); break;
+                case ConnectError:  listener.onConnectionFailed(item.e); break;
+                case Read:          listener.onDataReceived(item.data); break;
+                case IoError:       listener.onDisconnect(item.e); break;
             }
         }
         for(QueueItem item : queue2) {
             switch(item.type) {
-                case Connect:       listener.onSerialConnect      (); break;
-                case ConnectError:  listener.onSerialConnectError (item.e); break;
-                case Read:          listener.onSerialRead         (item.data); break;
-                case IoError:       listener.onSerialIoError      (item.e); break;
+                case Connect:       listener.onConnect(); break;
+                case ConnectError:  listener.onConnectionFailed(item.e); break;
+                case Read:          listener.onDataReceived(item.data); break;
+                case IoError:       listener.onDisconnect(item.e); break;
             }
         }
         queue1.clear();
@@ -140,13 +140,13 @@ public class SerialService extends Service implements SerialListener {
     /**
      * SerialListener
      */
-    public void onSerialConnect() {
+    public void onConnect() {
         if(connected) {
             synchronized (this) {
                 if (listener != null) {
                     mainLooper.post(() -> {
                         if (listener != null) {
-                            listener.onSerialConnect();
+                            listener.onConnect();
                         } else {
                             queue1.add(new QueueItem(QueueType.Connect, null, null));
                         }
@@ -158,13 +158,13 @@ public class SerialService extends Service implements SerialListener {
         }
     }
 
-    public void onSerialConnectError(Exception e) {
+    public void onConnectionFailed(Exception e) {
         if(connected) {
             synchronized (this) {
                 if (listener != null) {
                     mainLooper.post(() -> {
                         if (listener != null) {
-                            listener.onSerialConnectError(e);
+                            listener.onConnectionFailed(e);
                         } else {
                             queue1.add(new QueueItem(QueueType.ConnectError, null, e));
                             disconnect();
@@ -178,13 +178,13 @@ public class SerialService extends Service implements SerialListener {
         }
     }
 
-    public void onSerialRead(byte[] data) {
+    public void onDataReceived(byte[] data) {
         if(connected) {
             synchronized (this) {
                 if (listener != null) {
                     mainLooper.post(() -> {
                         if (listener != null) {
-                            listener.onSerialRead(data);
+                            listener.onDataReceived(data);
                         } else {
                             queue1.add(new QueueItem(QueueType.Read, data, null));
                         }
@@ -196,13 +196,13 @@ public class SerialService extends Service implements SerialListener {
         }
     }
 
-    public void onSerialIoError(Exception e) {
+    public void onDisconnect(Exception e) {
         if(connected) {
             synchronized (this) {
                 if (listener != null) {
                     mainLooper.post(() -> {
                         if (listener != null) {
-                            listener.onSerialIoError(e);
+                            listener.onDisconnect(e);
                         } else {
                             queue1.add(new QueueItem(QueueType.IoError, null, e));
                             disconnect();

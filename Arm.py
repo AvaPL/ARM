@@ -1,9 +1,11 @@
 from adafruit_servokit import ServoKit
 from bluetooth import BluetoothError
 
+
 class Arm:
     def __init__(self, bluetoothConnection, servoNumber, pulseWidths, angles):
         self.bluetoothConnection = bluetoothConnection
+        self.servoNumber = servoNumber
         self.servoKit = ServoKit(channels=16)
         for index in range(servoNumber):
             servo = self.servoKit.servo[index]
@@ -31,18 +33,15 @@ class Arm:
         splitCommand = command.split(' ')
         if splitCommand[0] == "angle":
             servoIndex = int(splitCommand[1])
-            angle = self.getNewAngle(servoIndex, splitCommand[2])
-            self.changeAngle(servoIndex, angle)
+            self.changeAngle(servoIndex, int(splitCommand[2]))
+        elif splitCommand[0] == "angles":
+            for index in range(self.servoNumber - 1):
+                self.bluetoothConnection.writeData(
+                    "angle " + str(index) + " " + str(round(self.servoKit.servo[index].angle)) + '\n')
+            self.bluetoothConnection.writeData(
+                "angle grab " + str(round(self.servoKit.servo[self.servoNumber - 1].angle)) + '\n')
         else:
             self.bluetoothConnection.writeData("Unknown command\n")
-
-    def getNewAngle(self, servoIndex, sign):
-        angle = self.servoKit.servo[servoIndex].angle
-        if sign == "+":
-            angle = angle + 2
-        elif sign == "-":
-            angle = angle - 2
-        return angle
 
     def changeAngle(self, servoIndex, angle):
         if 0 <= angle <= 180:

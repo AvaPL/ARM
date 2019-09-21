@@ -13,6 +13,7 @@ import com.pawelcembaluk.armcontroller.interfaces.ConnectionObserver;
 import com.pawelcembaluk.armcontroller.interfaces.DataReceivedObserver;
 import com.pawelcembaluk.armcontroller.interfaces.SerialListener;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -22,6 +23,8 @@ public class BluetoothConnection implements SerialListener {
 
     private enum Connected {False, Pending, True}
 
+    private static final String NEW_LINE = "\n";
+
     private static BluetoothConnection instance;
 
     private Connected connected = Connected.False;
@@ -30,6 +33,7 @@ public class BluetoothConnection implements SerialListener {
     private String deviceAddress;
     private Set<ConnectionObserver> connectionObservers = new HashSet<>();
     private Set<DataReceivedObserver> dataReceivedObservers = new HashSet<>();
+    private ArrayList<byte[]> unreceivedData = new ArrayList<>();
 
     public static BluetoothConnection getInstance() {
         if (instance == null)
@@ -50,12 +54,20 @@ public class BluetoothConnection implements SerialListener {
         return connected == Connected.True;
     }
 
-    public void addConnectionObserver(ConnectionObserver connectionObserver) {
-        connectionObservers.add(connectionObserver);
+    public void addConnectionObserver(ConnectionObserver observer) {
+        connectionObservers.add(observer);
     }
 
-    public void removeConnectionObserver(ConnectionObserver connectionObserver) {
-        connectionObservers.remove(connectionObserver);
+    public void removeConnectionObserver(ConnectionObserver observer) {
+        connectionObservers.remove(observer);
+    }
+
+    public void addDataReceivedObserver(DataReceivedObserver observer) {
+        dataReceivedObservers.add(observer);
+    }
+
+    public void removeDataReceivedObserver(DataReceivedObserver observer) {
+        dataReceivedObservers.remove(observer);
     }
 
     public void connect(Context context) {
@@ -73,7 +85,7 @@ public class BluetoothConnection implements SerialListener {
             service.connect(this);
             socket.connect(context, service, device);
         } catch (Exception e) {
-            onSerialConnectError(e);
+            onConnectionFailed(e);
         }
     }
 
@@ -102,7 +114,7 @@ public class BluetoothConnection implements SerialListener {
     }
 
     @Override
-    public void onSerialConnect() {
+    public void onConnect() {
         connected = Connected.True;
         notifyObservers(connectionObservers, ConnectionObserver::onConnect);
     }
@@ -113,7 +125,7 @@ public class BluetoothConnection implements SerialListener {
     }
 
     @Override
-    public void onSerialConnectError(Exception e) {
+    public void onConnectionFailed(Exception e) {
         cleanConnection();
         notifyObservers(connectionObservers, ConnectionObserver::onConnectionFailed);
     }
@@ -126,12 +138,28 @@ public class BluetoothConnection implements SerialListener {
     }
 
     @Override
-    public void onSerialRead(byte[] data) {
+    public void onDataReceived(byte[] data) {
         Log.d(getClass().getSimpleName(), "Data received: " + new String(data));
+        if (dataReceivedObservers.isEmpty())
+            unreceivedData.add(data);
+        else
+            notifyDataReceivedObservers(data);
+    }
+
+    private void notifyDataReceivedObservers(byte[] data) {
+        for (DataReceivedObserver observer : dataReceivedObservers)
+            observer.onDataReceived(data);
+    }
+
+    public void flushUnreceivedData() {
+        if (dataReceivedObservers.isEmpty()) return;
+        for (byte[] data : unreceivedData)
+            notifyDataReceivedObservers(data);
+        unreceivedData.clear();
     }
 
     @Override
-    public void onSerialIoError(Exception e) {
+    public void onDisconnect(Exception e) {
         cleanConnection();
         notifyObservers(connectionObservers, ConnectionObserver::onDisconnect);
     }
@@ -139,6 +167,16 @@ public class BluetoothConnection implements SerialListener {
     public void disconnect() {
         cleanConnection();
         notifyObservers(connectionObservers, ConnectionObserver::onDisconnect);
+    }
+
+    public void send(String string) {
+        if (connected != Connected.True) return;
+        try {
+            byte[] data = (string + NEW_LINE).getBytes();
+            socket.write(data);
+        } catch (Exception e) {
+            onDisconnect(e);
+        }
     }
 
     public SerialService getService() {
