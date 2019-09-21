@@ -4,13 +4,16 @@ import android.bluetooth.BluetoothDevice;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.pawelcembaluk.armcontroller.R;
+import com.pawelcembaluk.armcontroller.bluetooth.BluetoothConnection;
 
 import java.util.List;
 
@@ -32,22 +35,31 @@ public class BluetoothDeviceArrayAdapter extends ArrayAdapter<BluetoothDevice> {
         BluetoothDevice device = bluetoothDevices.get(position);
         if (convertView == null)
             convertView = inflateDeviceItem(parent);
-        initializeItemTextViews(convertView, device);
+        initializeItem(convertView, device);
         return convertView;
     }
 
     private View inflateDeviceItem(@NonNull ViewGroup parent) {
-        View convertView;
-        convertView = fragmentActivity.getLayoutInflater()
-                                      .inflate(R.layout.device_item, parent, false);
-        return convertView;
+        return fragmentActivity.getLayoutInflater().inflate(R.layout.device_item, parent, false);
     }
 
-    private void initializeItemTextViews(@Nullable View convertView,
-                                         BluetoothDevice device) {
+    private void initializeItem(@Nullable View convertView, BluetoothDevice device) {
+        if (convertView == null) return;
         TextView deviceName = convertView.findViewById(R.id.text_device_name);
         TextView deviceAddress = convertView.findViewById(R.id.text_device_address);
+        ImageView status = convertView.findViewById(R.id.status_bar);
         deviceName.setText(device.getName());
         deviceAddress.setText(device.getAddress());
+        initializeStatusColor(status, device.getAddress());
+    }
+
+    private void initializeStatusColor(ImageView status, String deviceAddress) {
+        int color = isSelectedDevice(deviceAddress) ? R.color.colorStatusActive :
+                    R.color.colorStatusInactive;
+        status.setBackgroundColor(ContextCompat.getColor(getContext(), color));
+    }
+
+    private boolean isSelectedDevice(String deviceAddress) {
+        return deviceAddress.equals(BluetoothConnection.getInstance().getDeviceAddress());
     }
 }

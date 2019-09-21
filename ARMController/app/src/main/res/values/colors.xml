@@ -8,5 +8,6 @@
     <color name="colorTextSecondary">#9E9E9E</color>
     <color name="colorIcons">#E0E0E0</color>
     <color name="colorIconsInactive">#9E9E9E</color>
+    <color name="colorStatusActive">#29B6F6</color>
     <color name="colorStatusInactive">#40212121</color>
 </resources>

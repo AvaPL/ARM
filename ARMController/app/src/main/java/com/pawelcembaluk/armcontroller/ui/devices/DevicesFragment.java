@@ -79,15 +79,16 @@ public class DevicesFragment extends ListFragment implements SwipeRefreshLayout.
     }
 
     private void setNoDevicesText() {
-        int stringResourceId = BluetoothConnection.isEnabled() ? R.string.text_no_devices_found :
-                               R.string.text_bluetooth_disabled;
+        int stringResourceId =
+                BluetoothConnection.getInstance().isEnabled() ? R.string.text_no_devices_found :
+                R.string.text_bluetooth_disabled;
         setEmptyText(getString(stringResourceId));
     }
 
 
     private void refreshDevices() {
         bluetoothDevices.clear();
-        BluetoothConnection.getBondedDevices().stream().filter(Devices::isNotLE)
+        BluetoothConnection.getInstance().getBondedDevices().stream().filter(Devices::isNotLE)
                            .sorted(Devices::compare).forEach(bluetoothDevices::add);
         devicesArrayAdapter.notifyDataSetChanged();
     }
@@ -95,8 +96,9 @@ public class DevicesFragment extends ListFragment implements SwipeRefreshLayout.
 
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
-        BluetoothDevice device = bluetoothDevices.get(position-1);
-        BluetoothConnection.deviceAddress = device.getAddress();
+        BluetoothDevice device = bluetoothDevices.get(position - 1);
+        BluetoothConnection.getInstance().setDeviceAddress(device.getAddress());
+        devicesArrayAdapter.notifyDataSetChanged();
         Log.d(getClass().getSimpleName(), device.getAddress());
     }
 
