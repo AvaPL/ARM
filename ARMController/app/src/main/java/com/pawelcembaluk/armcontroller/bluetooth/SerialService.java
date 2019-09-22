@@ -1,48 +1,41 @@
 package com.pawelcembaluk.armcontroller.bluetooth;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 
-import com.pawelcembaluk.armcontroller.R;
+import com.pawelcembaluk.armcontroller.interfaces.SerialListener;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- *      MIT License
- *
- *      Copyright (c) 2019 Kai Morich
- *
- *      Permission is hereby granted, free of charge, to any person obtaining a copy
- *      of this software and associated documentation files (the "Software"), to deal
- *      in the Software without restriction, including without limitation the rights
- *      to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *      copies of the Software, and to permit persons to whom the Software is
- *      furnished to do so, subject to the following conditions:
- *
- *      The above copyright notice and this permission notice shall be included in all
- *      copies or substantial portions of the Software.
- *
- *      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *      SOFTWARE.
+ * MIT License
+ * <p>
+ * Copyright (c) 2019 Kai Morich
+ * <p>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * <p>
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * <p>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -71,7 +64,6 @@ public class SerialService extends Service implements SerialListener {
 
     private SerialListener listener;
     private boolean connected;
-    private String notificationMsg;
 
     /**
      * Lifecylce
@@ -85,7 +77,6 @@ public class SerialService extends Service implements SerialListener {
 
     @Override
     public void onDestroy() {
-        cancelNotification();
         disconnect();
         super.onDestroy();
     }
@@ -99,22 +90,19 @@ public class SerialService extends Service implements SerialListener {
     /**
      * Api
      */
-    public void connect(SerialListener listener, String notificationMsg) {
+    public void connect(SerialListener listener) {
         this.listener = listener;
         connected = true;
-        this.notificationMsg = notificationMsg;
     }
 
     public void disconnect() {
         listener = null;
         connected = false;
-        notificationMsg = null;
     }
 
     public void attach(SerialListener listener) {
         if(Looper.getMainLooper().getThread() != Thread.currentThread())
             throw new IllegalArgumentException("not in main thread");
-        cancelNotification();
         // use synchronized() to prevent new items in queue2
         // new items will not be added to queue1 because mainLooper.post and attach() run in main thread
         if(connected) {
@@ -124,18 +112,18 @@ public class SerialService extends Service implements SerialListener {
         }
         for(QueueItem item : queue1) {
             switch(item.type) {
-                case Connect:       listener.onSerialConnect      (); break;
-                case ConnectError:  listener.onSerialConnectError (item.e); break;
-                case Read:          listener.onSerialRead         (item.data); break;
-                case IoError:       listener.onSerialIoError      (item.e); break;
+                case Connect:       listener.onConnect(); break;
+                case ConnectError:  listener.onConnectionFailed(item.e); break;
+                case Read:          listener.onDataReceived(item.data); break;
+                case IoError:       listener.onDisconnect(item.e); break;
             }
         }
         for(QueueItem item : queue2) {
             switch(item.type) {
-                case Connect:       listener.onSerialConnect      (); break;
-                case ConnectError:  listener.onSerialConnectError (item.e); break;
-                case Read:          listener.onSerialRead         (item.data); break;
-                case IoError:       listener.onSerialIoError      (item.e); break;
+                case Connect:       listener.onConnect(); break;
+                case ConnectError:  listener.onConnectionFailed(item.e); break;
+                case Read:          listener.onDataReceived(item.data); break;
+                case IoError:       listener.onDisconnect(item.e); break;
             }
         }
         queue1.clear();
@@ -143,59 +131,22 @@ public class SerialService extends Service implements SerialListener {
     }
 
     public void detach() {
-        if(connected)
-            createNotification();
         // items already in event queue (posted before detach() to mainLooper) will end up in queue1
         // items occurring later, will be moved directly to queue2
         // detach() and mainLooper.post run in the main thread, so all items are caught
         listener = null;
     }
 
-    private void createNotification() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel nc = new NotificationChannel(Constants.NOTIFICATION_CHANNEL, "Background service", NotificationManager.IMPORTANCE_LOW);
-            nc.setShowBadge(false);
-            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            nm.createNotificationChannel(nc);
-        }
-        Intent disconnectIntent = new Intent()
-                .setAction(Constants.INTENT_ACTION_DISCONNECT);
-        Intent restartIntent = new Intent()
-                .setClassName(this, Constants.INTENT_CLASS_MAIN_ACTIVITY)
-                .setAction(Intent.ACTION_MAIN)
-                .addCategory(Intent.CATEGORY_LAUNCHER);
-        PendingIntent disconnectPendingIntent = PendingIntent
-                .getBroadcast(this, 1, disconnectIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent restartPendingIntent = PendingIntent
-                .getActivity(this, 1, restartIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL)
-                .setSmallIcon(R.drawable.ic_notification)
-                .setColor(getResources().getColor(R.color.colorPrimary))
-                .setContentTitle(getResources().getString(R.string.app_name))
-                .setContentText(notificationMsg)
-                .setContentIntent(restartPendingIntent)
-                .setOngoing(true)
-                .addAction(new NotificationCompat.Action(R.drawable.ic_clear_white_24dp, "Disconnect", disconnectPendingIntent));
-        // @drawable/ic_notification created with Android Studio -> New -> Image Asset using @color/colorPrimaryDark as background color
-        // Android < API 21 does not support vectorDrawables in notifications, so both drawables used here, are created as .png instead of .xml
-        Notification notification = builder.build();
-        startForeground(Constants.NOTIFY_MANAGER_START_FOREGROUND_SERVICE, notification);
-    }
-
-    private void cancelNotification() {
-        stopForeground(true);
-    }
-
     /**
      * SerialListener
      */
-    public void onSerialConnect() {
+    public void onConnect() {
         if(connected) {
             synchronized (this) {
                 if (listener != null) {
                     mainLooper.post(() -> {
                         if (listener != null) {
-                            listener.onSerialConnect();
+                            listener.onConnect();
                         } else {
                             queue1.add(new QueueItem(QueueType.Connect, null, null));
                         }
@@ -207,35 +158,33 @@ public class SerialService extends Service implements SerialListener {
         }
     }
 
-    public void onSerialConnectError(Exception e) {
+    public void onConnectionFailed(Exception e) {
         if(connected) {
             synchronized (this) {
                 if (listener != null) {
                     mainLooper.post(() -> {
                         if (listener != null) {
-                            listener.onSerialConnectError(e);
+                            listener.onConnectionFailed(e);
                         } else {
                             queue1.add(new QueueItem(QueueType.ConnectError, null, e));
-                            cancelNotification();
                             disconnect();
                         }
                     });
                 } else {
                     queue2.add(new QueueItem(QueueType.ConnectError, null, e));
-                    cancelNotification();
                     disconnect();
                 }
             }
         }
     }
 
-    public void onSerialRead(byte[] data) {
+    public void onDataReceived(byte[] data) {
         if(connected) {
             synchronized (this) {
                 if (listener != null) {
                     mainLooper.post(() -> {
                         if (listener != null) {
-                            listener.onSerialRead(data);
+                            listener.onDataReceived(data);
                         } else {
                             queue1.add(new QueueItem(QueueType.Read, data, null));
                         }
@@ -247,22 +196,20 @@ public class SerialService extends Service implements SerialListener {
         }
     }
 
-    public void onSerialIoError(Exception e) {
+    public void onDisconnect(Exception e) {
         if(connected) {
             synchronized (this) {
                 if (listener != null) {
                     mainLooper.post(() -> {
                         if (listener != null) {
-                            listener.onSerialIoError(e);
+                            listener.onDisconnect(e);
                         } else {
                             queue1.add(new QueueItem(QueueType.IoError, null, e));
-                            cancelNotification();
                             disconnect();
                         }
                     });
                 } else {
                     queue2.add(new QueueItem(QueueType.IoError, null, e));
-                    cancelNotification();
                     disconnect();
                 }
             }

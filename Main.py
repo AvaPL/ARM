@@ -4,8 +4,7 @@ from Arm import Arm
 bluetoothConnection = BluetoothConnection(port=1)
 servoNumber = 4
 pulseWidths = [[800, 2200], [800, 2200], [800, 2200], [1600, 2200]]
-angles = [135, 50, 110, 90]
-arm = Arm(bluetoothConnection, servoNumber, pulseWidths, angles)
+arm = Arm(bluetoothConnection, servoNumber, pulseWidths)
 
 try:
     exitRead = False

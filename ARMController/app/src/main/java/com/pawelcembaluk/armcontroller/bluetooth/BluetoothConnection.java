@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.pawelcembaluk.armcontroller.interfaces.ConnectionObserver;
 import com.pawelcembaluk.armcontroller.interfaces.DataReceivedObserver;
+import com.pawelcembaluk.armcontroller.interfaces.SerialListener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,14 +22,18 @@ public class BluetoothConnection implements SerialListener {
 
     private enum Connected {False, Pending, True}
 
+    private static final String NEW_LINE = "\n";
+
     private static BluetoothConnection instance;
+
+    private final Set<ConnectionObserver> connectionObservers = new HashSet<>();
+    private final Set<DataReceivedObserver> dataReceivedObservers = new HashSet<>();
+    private final StringBuilder bufferedData = new StringBuilder();
 
     private Connected connected = Connected.False;
     private SerialService service;
     private SerialSocket socket;
     private String deviceAddress;
-    private Set<ConnectionObserver> connectionObservers = new HashSet<>();
-    private Set<DataReceivedObserver> dataReceivedObservers = new HashSet<>();
 
     public static BluetoothConnection getInstance() {
         if (instance == null)
@@ -49,12 +54,20 @@ public class BluetoothConnection implements SerialListener {
         return connected == Connected.True;
     }
 
-    public void addConnectionObserver(ConnectionObserver connectionObserver) {
-        connectionObservers.add(connectionObserver);
+    public void addConnectionObserver(ConnectionObserver observer) {
+        connectionObservers.add(observer);
     }
 
-    public void removeConnectionObserver(ConnectionObserver connectionObserver) {
-        connectionObservers.remove(connectionObserver);
+    public void removeConnectionObserver(ConnectionObserver observer) {
+        connectionObservers.remove(observer);
+    }
+
+    public void addDataReceivedObserver(DataReceivedObserver observer) {
+        dataReceivedObservers.add(observer);
+    }
+
+    public void removeDataReceivedObserver(DataReceivedObserver observer) {
+        dataReceivedObservers.remove(observer);
     }
 
     public void connect(Context context) {
@@ -63,40 +76,32 @@ public class BluetoothConnection implements SerialListener {
             return;
         }
         if (connected != Connected.False) return;
-        Log.d(getClass().getSimpleName(), "connect");
         try {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             BluetoothDevice device = bluetoothAdapter.getRemoteDevice(deviceAddress);
-            String deviceName = device.getName() != null ? device.getName() : device.getAddress();
             connected = Connected.Pending;
             Toast.makeText(context, "Connecting...", Toast.LENGTH_SHORT).show();
             socket = new SerialSocket();
-            service.connect(this, "Connected to " + deviceName);
+            service.connect(this);
             socket.connect(context, service, device);
         } catch (Exception e) {
-            onSerialConnectError(e);
+            onConnectionFailed(e);
         }
     }
 
     public void startService(Activity activity) {
-        Log.d(getClass().getSimpleName(), "startService");
-        if (service != null) {
-            Log.d(getClass().getSimpleName(), "attaching service");
+        if (service != null)
             service.attach(this);
-        } else {
-            Log.d(getClass().getSimpleName(), "starting service");
+        else
             activity.startService(new Intent(activity, SerialService.class));
-        }
     }
 
     public void bindService(Activity activity, ServiceConnection serviceConnection) {
-        Log.d(getClass().getSimpleName(), "bindService");
         activity.bindService(new Intent(activity, SerialService.class), serviceConnection,
                              Context.BIND_AUTO_CREATE);
     }
 
     public void unbindService(Activity activity, ServiceConnection serviceConnection) {
-        Log.d(getClass().getSimpleName(), "unbindService");
         try {
             activity.unbindService(serviceConnection);
         } catch (Exception ignored) {
@@ -104,14 +109,12 @@ public class BluetoothConnection implements SerialListener {
     }
 
     public void detachService(Activity activity) {
-        Log.d(getClass().getSimpleName(), "detachService");
         if (service != null && !activity.isChangingConfigurations())
             service.detach();
     }
 
     @Override
-    public void onSerialConnect() {
-        Log.d(getClass().getSimpleName(), "connected (yay!)");
+    public void onConnect() {
         connected = Connected.True;
         notifyObservers(connectionObservers, ConnectionObserver::onConnect);
     }
@@ -122,8 +125,7 @@ public class BluetoothConnection implements SerialListener {
     }
 
     @Override
-    public void onSerialConnectError(Exception e) {
-        Log.d(getClass().getSimpleName(), "connection error");
+    public void onConnectionFailed(Exception e) {
         cleanConnection();
         notifyObservers(connectionObservers, ConnectionObserver::onConnectionFailed);
     }
@@ -136,21 +138,66 @@ public class BluetoothConnection implements SerialListener {
     }
 
     @Override
-    public void onSerialRead(byte[] data) {
+    public void onDataReceived(byte[] data) {
         Log.d(getClass().getSimpleName(), "Data received: " + new String(data));
+        bufferedData.append(new String(data));
+        if (!dataReceivedObservers.isEmpty())
+            flushBufferedData();
+    }
+
+    public void flushBufferedData() {
+        if (dataReceivedObservers.isEmpty()) return;
+        String dataString = bufferedData.toString();
+        if (endsWithNewLine(dataString))
+            flushAllData();
+        else
+            flushOnlyFullLines();
+    }
+
+    private boolean endsWithNewLine(String dataString) {
+        return dataString.matches("(?s).*\\R$");
+    }
+
+    private void flushAllData() {
+        String[] dataStrings = bufferedData.toString().split("\\R");
+        bufferedData.setLength(0);
+        for (String string : dataStrings)
+            notifyDataReceivedObservers(string);
+    }
+
+    private void notifyDataReceivedObservers(String data) {
+        for (DataReceivedObserver observer : dataReceivedObservers)
+            observer.onDataReceived(data);
+    }
+
+    private void flushOnlyFullLines() {
+        String[] dataStrings = bufferedData.toString().split("\\R");
+        if (dataStrings.length < 2) return; //No lines or only one line that doesn't end with \R.
+        bufferedData.setLength(0);
+        bufferedData.append(dataStrings[dataStrings.length - 1]);
+        for (int i = 0; i < dataStrings.length - 1; ++i)
+            notifyDataReceivedObservers(dataStrings[i]);
     }
 
     @Override
-    public void onSerialIoError(Exception e) {
-        Log.d(getClass().getSimpleName(), "io error (disconnect)");
+    public void onDisconnect(Exception e) {
         cleanConnection();
         notifyObservers(connectionObservers, ConnectionObserver::onDisconnect);
     }
 
     public void disconnect() {
-        Log.d(getClass().getSimpleName(), "disconnect");
         cleanConnection();
         notifyObservers(connectionObservers, ConnectionObserver::onDisconnect);
+    }
+
+    public void send(String string) {
+        if (connected != Connected.True) return;
+        try {
+            byte[] data = (string + NEW_LINE).getBytes();
+            socket.write(data);
+        } catch (Exception e) {
+            onDisconnect(e);
+        }
     }
 
     public SerialService getService() {

@@ -1,6 +1,4 @@
-package com.pawelcembaluk.armcontroller.bluetooth;
-
-import com.pawelcembaluk.armcontroller.BuildConfig;
+package com.pawelcembaluk.armcontroller.interfaces;
 
 /**
  * MIT License
@@ -26,15 +24,12 @@ import com.pawelcembaluk.armcontroller.BuildConfig;
  * SOFTWARE.
  */
 
-class Constants {
+public interface SerialListener {
+    void onConnect();
 
-    // values have to be globally unique
-    static final String INTENT_ACTION_DISCONNECT = BuildConfig.APPLICATION_ID + ".Disconnect";
-    static final String NOTIFICATION_CHANNEL = BuildConfig.APPLICATION_ID + ".Channel";
-    static final String INTENT_CLASS_MAIN_ACTIVITY = BuildConfig.APPLICATION_ID + ".MainActivity";
+    void onConnectionFailed(Exception e);
 
-    // values have to be unique within each app
-    static final int NOTIFY_MANAGER_START_FOREGROUND_SERVICE = 1001;
+    void onDataReceived(byte[] data);
 
-    private Constants() {}
+    void onDisconnect(Exception e);
 }

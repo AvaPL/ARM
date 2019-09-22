@@ -8,14 +8,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.pawelcembaluk.armcontroller.R;
+import com.pawelcembaluk.armcontroller.bluetooth.BluetoothConnection;
+import com.pawelcembaluk.armcontroller.interfaces.ConnectionObserver;
+import com.pawelcembaluk.armcontroller.interfaces.DataReceivedObserver;
 
-public class ControllerFragment extends Fragment {
+public class ControllerFragment extends Fragment implements ConnectionObserver, DataReceivedObserver {
 
     private static final String SHARED_PREFERENCES_ANGLES = "angles";
     private static final String KEY_JOINT_VALUE = "joint_value";
@@ -29,7 +33,22 @@ public class ControllerFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        BluetoothConnection.getInstance().addConnectionObserver(this);
+        BluetoothConnection.getInstance().addDataReceivedObserver(this);
+        BluetoothConnection.getInstance().flushBufferedData();
+        if (BluetoothConnection.getInstance().isConnected())
+            queryCurrentAnglesState();
+    }
+
+    private void queryCurrentAnglesState() {
+        BluetoothConnection.getInstance().send("angles"); //Gets current arms state.
+    }
+
+    @Override
+    public void onDestroy() {
+        BluetoothConnection.getInstance().removeConnectionObserver(this);
+        BluetoothConnection.getInstance().removeDataReceivedObserver(this);
+        super.onDestroy();
     }
 
     @Override
@@ -87,11 +106,30 @@ public class ControllerFragment extends Fragment {
     }
 
     private void setListeners() {
+        setJointListeners();
+        setGrabListener();
+    }
+
+    private void setJointListeners() {
         for (int i = 0; i < jointSeekBars.length && i < jointTextViews.length; ++i) {
-            SeekBar.OnSeekBarChangeListener listener =
-                    OnSeekBarChangeListenerFactory.getTextViewListener(jointTextViews[i]);
+            SeekBar.OnSeekBarChangeListener listener = getTextServoListener(i);
             jointSeekBars[i].setOnSeekBarChangeListener(listener);
         }
+    }
+
+    private SeekBar.OnSeekBarChangeListener getTextServoListener(int index) {
+        SeekBar.OnSeekBarChangeListener textListener =
+                OnSeekBarChangeListenerFactory.getTextViewListener(jointTextViews[index]);
+        SeekBar.OnSeekBarChangeListener servoListener =
+                OnSeekBarChangeListenerFactory.getServoListener(index);
+        return OnSeekBarChangeListenerFactory.getComplexListener(textListener, servoListener);
+    }
+
+    private void setGrabListener() {
+        int grabServoIndex = jointSeekBars.length;
+        SeekBar.OnSeekBarChangeListener listener = OnSeekBarChangeListenerFactory
+                .getServoListener(grabServoIndex);
+        grabSeekBar.setOnSeekBarChangeListener(listener);
     }
 
     @Override
@@ -103,5 +141,42 @@ public class ControllerFragment extends Fragment {
         anglesEditor.putInt(KEY_GRAB_VALUE, grabSeekBar.getProgress());
         anglesEditor.apply();
         super.onPause();
+    }
+
+    @Override
+    public void onConnect() {
+        queryCurrentAnglesState();
+    }
+
+    @Override
+    public void onConnectionFailed() {
+    }
+
+    @Override
+    public void onDisconnect() {
+    }
+
+    @Override
+    public void onDataReceived(String command) {
+        String[] commandSplit = command.split(" ");
+        if (commandSplit[0].equals("angle"))
+            setAngle(commandSplit);
+        else
+            Toast.makeText(getContext(), command.trim(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void setAngle(String[] commandSplit) {
+        int angle = Integer.parseInt(commandSplit[2]);
+        if (!isAngleCorrect(angle)) return;
+        if (commandSplit[1].equals("grab")) {
+            grabSeekBar.setProgress(angle);
+            return;
+        }
+        int index = Integer.parseInt(commandSplit[1]);
+        jointSeekBars[index].setProgress(angle);
+    }
+
+    private boolean isAngleCorrect(int angle) {
+        return 0 <= angle && angle <= 180;
     }
 }
