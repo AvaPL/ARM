@@ -17,11 +17,7 @@ class BluetoothConnection:
 
     def readData(self, bytes):
         data = self.clientSocket.recv(bytes)
-        return self.decodeData(data)
-
-    def decodeData(self, data):
-        decodedData = data.decode()
-        return decodedData.rstrip(" \r\n")  # return without whitespaces
+        return data.decode()
 
     def writeData(self, data):
         encodedData = data.encode()

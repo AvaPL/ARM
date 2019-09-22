@@ -18,7 +18,6 @@ import com.pawelcembaluk.armcontroller.R;
 import com.pawelcembaluk.armcontroller.bluetooth.BluetoothConnection;
 import com.pawelcembaluk.armcontroller.interfaces.ConnectionObserver;
 import com.pawelcembaluk.armcontroller.interfaces.DataReceivedObserver;
-import com.pawelcembaluk.armcontroller.interfaces.SerialListener;
 
 public class ControllerFragment extends Fragment implements ConnectionObserver, DataReceivedObserver {
 
@@ -36,7 +35,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         super.onCreate(savedInstanceState);
         BluetoothConnection.getInstance().addConnectionObserver(this);
         BluetoothConnection.getInstance().addDataReceivedObserver(this);
-        BluetoothConnection.getInstance().flushUnreceivedData();
+        BluetoothConnection.getInstance().flushBufferedData();
         if (BluetoothConnection.getInstance().isConnected())
             queryCurrentAnglesState();
     }
@@ -158,8 +157,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     }
 
     @Override
-    public void onDataReceived(byte[] data) {
-        String command = new String(data).replaceAll("\\R", "");
+    public void onDataReceived(String command) {
         String[] commandSplit = command.split(" ");
         if (commandSplit[0].equals("angle"))
             setAngle(commandSplit);

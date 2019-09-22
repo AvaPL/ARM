@@ -13,7 +13,6 @@ import com.pawelcembaluk.armcontroller.interfaces.ConnectionObserver;
 import com.pawelcembaluk.armcontroller.interfaces.DataReceivedObserver;
 import com.pawelcembaluk.armcontroller.interfaces.SerialListener;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -27,13 +26,14 @@ public class BluetoothConnection implements SerialListener {
 
     private static BluetoothConnection instance;
 
+    private final Set<ConnectionObserver> connectionObservers = new HashSet<>();
+    private final Set<DataReceivedObserver> dataReceivedObservers = new HashSet<>();
+    private final StringBuilder bufferedData = new StringBuilder();
+
     private Connected connected = Connected.False;
     private SerialService service;
     private SerialSocket socket;
     private String deviceAddress;
-    private Set<ConnectionObserver> connectionObservers = new HashSet<>();
-    private Set<DataReceivedObserver> dataReceivedObservers = new HashSet<>();
-    private ArrayList<byte[]> unreceivedData = new ArrayList<>();
 
     public static BluetoothConnection getInstance() {
         if (instance == null)
@@ -140,22 +140,43 @@ public class BluetoothConnection implements SerialListener {
     @Override
     public void onDataReceived(byte[] data) {
         Log.d(getClass().getSimpleName(), "Data received: " + new String(data));
-        if (dataReceivedObservers.isEmpty())
-            unreceivedData.add(data);
-        else
-            notifyDataReceivedObservers(data);
+        bufferedData.append(new String(data));
+        if (!dataReceivedObservers.isEmpty())
+            flushBufferedData();
     }
 
-    private void notifyDataReceivedObservers(byte[] data) {
+    public void flushBufferedData() {
+        if (dataReceivedObservers.isEmpty()) return;
+        String dataString = bufferedData.toString();
+        if (endsWithNewLine(dataString))
+            flushAllData();
+        else
+            flushOnlyFullLines();
+    }
+
+    private boolean endsWithNewLine(String dataString) {
+        return dataString.matches("(?s).*\\R$");
+    }
+
+    private void flushAllData() {
+        String[] dataStrings = bufferedData.toString().split("\\R");
+        bufferedData.setLength(0);
+        for (String string : dataStrings)
+            notifyDataReceivedObservers(string);
+    }
+
+    private void notifyDataReceivedObservers(String data) {
         for (DataReceivedObserver observer : dataReceivedObservers)
             observer.onDataReceived(data);
     }
 
-    public void flushUnreceivedData() {
-        if (dataReceivedObservers.isEmpty()) return;
-        for (byte[] data : unreceivedData)
-            notifyDataReceivedObservers(data);
-        unreceivedData.clear();
+    private void flushOnlyFullLines() {
+        String[] dataStrings = bufferedData.toString().split("\\R");
+        if (dataStrings.length < 2) return; //No lines or only one line that doesn't end with \R.
+        bufferedData.setLength(0);
+        bufferedData.append(dataStrings[dataStrings.length - 1]);
+        for (int i = 0; i < dataStrings.length - 1; ++i)
+            notifyDataReceivedObservers(dataStrings[i]);
     }
 
     @Override
