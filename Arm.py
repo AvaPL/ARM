@@ -4,14 +4,13 @@ import re
 
 
 class Arm:
-    def __init__(self, bluetoothConnection, servoNumber, pulseWidths, angles):
+    def __init__(self, bluetoothConnection, servoNumber, pulseWidths):
         self.bluetoothConnection = bluetoothConnection
         self.servoNumber = servoNumber
         self.servoKit = ServoKit(channels=16)
         for index in range(servoNumber):
             servo = self.servoKit.servo[index]
             servo.set_pulse_width_range(pulseWidths[index][0], pulseWidths[index][1])
-            servo.angle = angles[index]
         self.bufferedData = ""
 
     def readCommands(self):
