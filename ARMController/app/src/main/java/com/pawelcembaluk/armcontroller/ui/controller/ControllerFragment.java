@@ -41,16 +41,8 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     }
 
     private void queryCurrentAnglesState() {
-        BluetoothConnection.getInstance().send("angles"); //Gets current arms state.
+        BluetoothConnection.getInstance().send("angles"); //Gets current arm state.
     }
-
-    @Override
-    public void onDestroy() {
-        BluetoothConnection.getInstance().removeConnectionObserver(this);
-        BluetoothConnection.getInstance().removeDataReceivedObserver(this);
-        super.onDestroy();
-    }
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -141,6 +133,13 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         anglesEditor.putInt(KEY_GRAB_VALUE, grabSeekBar.getProgress());
         anglesEditor.apply();
         super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        BluetoothConnection.getInstance().removeConnectionObserver(this);
+        BluetoothConnection.getInstance().removeDataReceivedObserver(this);
+        super.onDestroy();
     }
 
     @Override

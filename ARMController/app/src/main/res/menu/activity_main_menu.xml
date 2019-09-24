@@ -11,4 +11,8 @@
             android:id="@+id/bluetooth_settings"
             android:title="@string/title_bluetooth_settings"
             app:showAsAction="never" />
+    <item
+        android:id="@+id/shutdown_raspberry_pi"
+        android:title="@string/title_shutdown_raspberry_pi"
+        app:showAsAction="never" />
 </menu>

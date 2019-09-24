@@ -17,11 +17,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private SeekBarPreference continuousCommandsDelay;
 
     @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        setPreferencesFromResource(R.xml.preferences, rootKey);
-        continuousCommandsDelay = findPreference(KEY_CONTINUOUS_COMMANDS_DELAY);
-        initializeContinuousCommandsDelay();
-        setDrawerEnabled(false);
+    public void onDestroyView() {
+        continuousCommandsDelay.setValue(floorToMultipleOf10(continuousCommandsDelay.getValue()));
+        setDrawerEnabled(true);
+        super.onDestroyView();
     }
 
     private void setDrawerEnabled(boolean isEnabled) {
@@ -30,6 +29,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             ((DrawerEnabler) fragmentActivity).setDrawerEnabled(isEnabled);
     }
 
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.preferences, rootKey);
+        continuousCommandsDelay = findPreference(KEY_CONTINUOUS_COMMANDS_DELAY);
+        initializeContinuousCommandsDelay();
+        setDrawerEnabled(false);
+    }
     private void initializeContinuousCommandsDelay() {
         String summary = getSummary(continuousCommandsDelay.getValue());
         continuousCommandsDelay.setSummary(summary);
@@ -55,12 +61,5 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             continuousCommandsDelay.setSummary(summary);
             return true;
         };
-    }
-
-    @Override
-    public void onDestroyView() {
-        continuousCommandsDelay.setValue(floorToMultipleOf10(continuousCommandsDelay.getValue()));
-        setDrawerEnabled(true);
-        super.onDestroyView();
     }
 }
