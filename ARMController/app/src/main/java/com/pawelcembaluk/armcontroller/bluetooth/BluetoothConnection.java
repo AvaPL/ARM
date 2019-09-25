@@ -9,6 +9,7 @@ import android.content.ServiceConnection;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.pawelcembaluk.armcontroller.R;
 import com.pawelcembaluk.armcontroller.interfaces.ConnectionObserver;
 import com.pawelcembaluk.armcontroller.interfaces.DataReceivedObserver;
 import com.pawelcembaluk.armcontroller.interfaces.SerialListener;
@@ -72,11 +73,15 @@ public class BluetoothConnection implements SerialListener {
     }
 
     public void connect(Context context) {
-        if (deviceAddress == null) {
-            Toast.makeText(context, "No device selected", Toast.LENGTH_SHORT).show();
+        if (connected != Connected.False) return;
+        if (!isEnabled()) {
+            Toast.makeText(context, R.string.text_bluetooth_disabled, Toast.LENGTH_SHORT).show();
             return;
         }
-        if (connected != Connected.False) return;
+        if (deviceAddress == null) {
+            Toast.makeText(context, R.string.text_no_device_selected, Toast.LENGTH_SHORT).show();
+            return;
+        }
         connectToDevice(context);
     }
 
@@ -106,7 +111,7 @@ public class BluetoothConnection implements SerialListener {
     private void safelyConnectToDevice(Context context) throws IOException {
         BluetoothDevice device = getBluetoothDevice();
         connected = Connected.Pending;
-        Toast.makeText(context, "Connecting...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, R.string.text_connecting, Toast.LENGTH_SHORT).show();
         socket = new SerialSocket();
         service.connect(this);
         socket.connect(context, service, device);

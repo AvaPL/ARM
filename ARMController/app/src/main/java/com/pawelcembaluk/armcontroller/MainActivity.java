@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -28,7 +27,6 @@ import com.pawelcembaluk.armcontroller.bluetooth.BluetoothConnection;
 import com.pawelcembaluk.armcontroller.bluetooth.SerialService;
 import com.pawelcembaluk.armcontroller.interfaces.ConnectionObserver;
 import com.pawelcembaluk.armcontroller.interfaces.DrawerEnabler;
-import com.pawelcembaluk.armcontroller.ui.settings.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity implements DrawerEnabler, ServiceConnection, ConnectionObserver {
 
@@ -49,9 +47,9 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler, Se
         appBarConfiguration =
                 new AppBarConfiguration.Builder(R.id.nav_controller, R.id.nav_devices)
                         .setDrawerLayout(drawer).build();
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         initializeToolbar();
         initializeNavigation();
-        readSettings();
         loadLastDevice();
         BluetoothConnection.getInstance().addConnectionObserver(this);
     }
@@ -66,13 +64,6 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler, Se
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-    }
-
-    private void readSettings() {
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Log.d(getClass().getSimpleName(), "Continuous commands delay: " + sharedPreferences.getInt(
-                SettingsFragment.KEY_CONTINUOUS_COMMANDS_DELAY, 50)); //TODO: Use this setting.
     }
 
     private void loadLastDevice() {
@@ -170,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler, Se
         if (BluetoothConnection.getInstance().isConnected())
             BluetoothConnection.getInstance().send("shutdown");
         else
-            Toast.makeText(this, R.string.toast_not_connected, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.text_not_connected, Toast.LENGTH_SHORT).show();
         return true;
     }
 
@@ -196,17 +187,17 @@ public class MainActivity extends AppCompatActivity implements DrawerEnabler, Se
     @Override
     public void onConnect() {
         RPiIcon.setTint(getColor(R.color.colorIcons));
-        Toast.makeText(this, R.string.toast_connected, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.text_connected, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onConnectionFailed() {
-        Toast.makeText(this, R.string.toast_connection_failed, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.text_connection_failed, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDisconnect() {
         RPiIcon.setTint(getColor(R.color.colorIconsInactive));
-        Toast.makeText(this, R.string.toast_disconnected, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.text_disconnected, Toast.LENGTH_SHORT).show();
     }
 }

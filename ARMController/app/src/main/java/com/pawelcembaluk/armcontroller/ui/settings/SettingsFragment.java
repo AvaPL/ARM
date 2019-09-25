@@ -13,6 +13,7 @@ import com.pawelcembaluk.armcontroller.interfaces.DrawerEnabler;
 public class SettingsFragment extends PreferenceFragmentCompat {
 
     public static final String KEY_CONTINUOUS_COMMANDS_DELAY = "continuous_commands_delay";
+    public static final int DEFAULT_CONTINUOUS_COMMANDS_DELAY = 50;
 
     private SeekBarPreference continuousCommandsDelay;
 
@@ -36,6 +37,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         initializeContinuousCommandsDelay();
         setDrawerEnabled(false);
     }
+
     private void initializeContinuousCommandsDelay() {
         String summary = getSummary(continuousCommandsDelay.getValue());
         continuousCommandsDelay.setSummary(summary);

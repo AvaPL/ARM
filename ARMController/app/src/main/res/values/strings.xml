@@ -20,17 +20,20 @@
 
     <string name="text_release">RELEASE</string>
     <string name="text_grab">GRAB</string>
-    <string name="text_initializing">Initializing…</string>
-    <string name="text_no_devices_found">No Bluetooth devices found.</string>
+
     <string name="text_bluetooth_disabled">Bluetooth is disabled.</string>
+    <string name="text_connected">Connected</string>
+    <string name="text_connecting">Connecting…</string>
+    <string name="text_connection_failed">Connection failed</string>
+    <string name="text_disconnected">Disconnected</string>
+    <string name="text_initializing">Initializing…</string>
+    <string name="text_no_device_selected">No device selected</string>
+    <string name="text_no_devices_found">No Bluetooth devices found.</string>
+    <string name="text_not_connected">Not connected</string>
 
     <string name="title_connect_to_rpi">Connect to RPi</string>
     <string name="title_bluetooth_settings">Bluetooth settings</string>
     <string name="title_shutdown_raspberry_pi">Shutdown Raspberry Pi</string>
 
     <string name="header_paired_devices">Paired devices</string>
-    <string name="toast_not_connected">Not connected</string>
-    <string name="toast_connected">Connected</string>
-    <string name="toast_connection_failed">Connection failed</string>
-    <string name="toast_disconnected">Disconnected</string>
 </resources>
