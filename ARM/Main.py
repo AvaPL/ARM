@@ -1,4 +1,4 @@
-from BluetoothConnection import BluetoothConnection
+from connection.BluetoothConnection import BluetoothConnection
 from Arm import Arm
 import RPi.GPIO as GPIO
 import subprocess
