@@ -1,7 +1,7 @@
 from adafruit_servokit import ServoKit
 from bluetooth import BluetoothError
 
-from BufferedData import BufferedData
+from connection.BufferedData import BufferedData
 
 
 class Arm:
@@ -40,7 +40,7 @@ class Arm:
         if command == "angles":
             self.sendAngles()
         elif self.isNavigationCommand(command):
-            pass # TODO: Implement movement.
+            pass  # TODO: Implement movement.
         elif splitCommand[0] == "angle":
             self.changeAngle(splitCommand)
         else:
