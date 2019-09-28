@@ -2,6 +2,8 @@ from adafruit_servokit import ServoKit
 from bluetooth import BluetoothError
 import re
 
+from BufferedData import BufferedData
+
 
 class Arm:
     def __init__(self, bluetoothConnection, servoNumber, pulseWidths):
@@ -11,7 +13,7 @@ class Arm:
         for index in range(servoNumber):
             servo = self.servoKit.servo[index]
             servo.set_pulse_width_range(pulseWidths[index][0], pulseWidths[index][1])
-        self.bufferedData = ""
+        self.bufferedData = BufferedData()
 
     def readCommands(self):
         # returns True if the arm received an "exit" command
@@ -24,28 +26,13 @@ class Arm:
 
     def readUntilExit(self):
         while True:
-            self.bufferedData += self.bluetoothConnection.readData(1024)
-            commands = self.flushBufferedData()
+            data = self.bluetoothConnection.readData(1024)
+            self.bufferedData.append(data)
+            commands = self.bufferedData.flush()
             for command in commands:
                 if command == "exit":
                     return True
                 self.processCommand(command)
-
-    def flushBufferedData(self):
-        return self.flushAllData() if self.endsWithNewLine(self.bufferedData) else self.flushOnlyFullLines()
-
-    def endsWithNewLine(self, string):
-        return re.fullmatch(".*[\r\n]+", string, re.S)
-
-    def flushAllData(self):
-        dataStrings = self.bufferedData.splitlines()
-        self.bufferedData = ""
-        return dataStrings
-
-    def flushOnlyFullLines(self):
-        dataStrings = self.bufferedData.splitlines()
-        self.bufferedData = dataStrings[-1]  # last string
-        return dataStrings[:-1]  # everything except last string
 
     def processCommand(self, command):
         print(command)
