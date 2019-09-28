@@ -1,2 +1,2 @@
 # ARM
-Scripts for a robotic arm.
+Scripts and a controller for a robotic arm.
