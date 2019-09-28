@@ -1,11 +1,13 @@
 package com.pawelcembaluk.armcontroller.ui.controller;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,11 +15,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import com.pawelcembaluk.armcontroller.R;
 import com.pawelcembaluk.armcontroller.bluetooth.BluetoothConnection;
 import com.pawelcembaluk.armcontroller.interfaces.ConnectionObserver;
 import com.pawelcembaluk.armcontroller.interfaces.DataReceivedObserver;
+import com.pawelcembaluk.armcontroller.ui.settings.SettingsFragment;
 
 public class ControllerFragment extends Fragment implements ConnectionObserver, DataReceivedObserver {
 
@@ -29,10 +33,18 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     private SeekBar[] jointSeekBars;
     private SeekBar grabSeekBar;
     private TextView[] jointTextViews;
+    private ImageButton up;
+    private ImageButton down;
+    private ImageButton left;
+    private ImageButton right;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeBluetoothConnection();
+    }
+
+    private void initializeBluetoothConnection() {
         BluetoothConnection.getInstance().addConnectionObserver(this);
         BluetoothConnection.getInstance().addDataReceivedObserver(this);
         BluetoothConnection.getInstance().flushBufferedData();
@@ -41,14 +53,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     }
 
     private void queryCurrentAnglesState() {
-        BluetoothConnection.getInstance().send("angles"); //Gets current arms state.
-    }
-
-    @Override
-    public void onDestroy() {
-        BluetoothConnection.getInstance().removeConnectionObserver(this);
-        BluetoothConnection.getInstance().removeDataReceivedObserver(this);
-        super.onDestroy();
+        BluetoothConnection.getInstance().send("angles"); //Gets current arm state.
     }
 
     @Override
@@ -61,6 +66,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         initializeSeekBars();
         initializeJointTextViews();
+        initializeButtons();
         initializeAnglesSharedPreferences();
         loadState();
         setTexts();
@@ -82,6 +88,32 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         jointTextViews[0] = getView().findViewById(R.id.text_joint_0);
         jointTextViews[1] = getView().findViewById(R.id.text_joint_1);
         jointTextViews[2] = getView().findViewById(R.id.text_joint_2);
+    }
+
+    private void initializeButtons() {
+        if (getView() == null) return;
+        up = getView().findViewById(R.id.button_up);
+        down = getView().findViewById(R.id.button_down);
+        left = getView().findViewById(R.id.button_left);
+        right = getView().findViewById(R.id.button_right);
+        setOnTouchListeners();
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void setOnTouchListeners() {
+        int delay = getDelay();
+        up.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("forward", delay));
+        down.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("back", delay));
+        left.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("left", delay));
+        right.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("right", delay));
+    }
+
+    private int getDelay() {
+        if (getContext() == null) return SettingsFragment.DEFAULT_CONTINUOUS_COMMANDS_DELAY;
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        return sharedPreferences.getInt(SettingsFragment.KEY_CONTINUOUS_COMMANDS_DELAY,
+                                        SettingsFragment.DEFAULT_CONTINUOUS_COMMANDS_DELAY);
     }
 
     private void initializeAnglesSharedPreferences() {
@@ -141,6 +173,13 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         anglesEditor.putInt(KEY_GRAB_VALUE, grabSeekBar.getProgress());
         anglesEditor.apply();
         super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        BluetoothConnection.getInstance().removeConnectionObserver(this);
+        BluetoothConnection.getInstance().removeDataReceivedObserver(this);
+        super.onDestroy();
     }
 
     @Override

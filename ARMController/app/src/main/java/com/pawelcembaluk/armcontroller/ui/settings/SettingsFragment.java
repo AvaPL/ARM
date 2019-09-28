@@ -13,8 +13,22 @@ import com.pawelcembaluk.armcontroller.interfaces.DrawerEnabler;
 public class SettingsFragment extends PreferenceFragmentCompat {
 
     public static final String KEY_CONTINUOUS_COMMANDS_DELAY = "continuous_commands_delay";
+    public static final int DEFAULT_CONTINUOUS_COMMANDS_DELAY = 50;
 
     private SeekBarPreference continuousCommandsDelay;
+
+    @Override
+    public void onDestroyView() {
+        continuousCommandsDelay.setValue(floorToMultipleOf10(continuousCommandsDelay.getValue()));
+        setDrawerEnabled(true);
+        super.onDestroyView();
+    }
+
+    private void setDrawerEnabled(boolean isEnabled) {
+        FragmentActivity fragmentActivity = getActivity();
+        if (fragmentActivity instanceof DrawerEnabler)
+            ((DrawerEnabler) fragmentActivity).setDrawerEnabled(isEnabled);
+    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -22,12 +36,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         continuousCommandsDelay = findPreference(KEY_CONTINUOUS_COMMANDS_DELAY);
         initializeContinuousCommandsDelay();
         setDrawerEnabled(false);
-    }
-
-    private void setDrawerEnabled(boolean isEnabled) {
-        FragmentActivity fragmentActivity = getActivity();
-        if (fragmentActivity instanceof DrawerEnabler)
-            ((DrawerEnabler) fragmentActivity).setDrawerEnabled(isEnabled);
     }
 
     private void initializeContinuousCommandsDelay() {
@@ -55,12 +63,5 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             continuousCommandsDelay.setSummary(summary);
             return true;
         };
-    }
-
-    @Override
-    public void onDestroyView() {
-        continuousCommandsDelay.setValue(floorToMultipleOf10(continuousCommandsDelay.getValue()));
-        setDrawerEnabled(true);
-        super.onDestroyView();
     }
 }

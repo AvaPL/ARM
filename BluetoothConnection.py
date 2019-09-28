@@ -8,6 +8,7 @@ class BluetoothConnection:
         self.serverSocket.bind(("", self.port))
         self.serverSocket.listen(self.port)
         self.clientSocket = None
+        self.newline = '\n'
 
     def establish(self):
         print("Waiting for a new connection...")
@@ -20,7 +21,7 @@ class BluetoothConnection:
         return data.decode()
 
     def writeData(self, data):
-        encodedData = data.encode()
+        encodedData = (data + self.newline).encode()
         self.clientSocket.send(encodedData)
 
     def close(self):
