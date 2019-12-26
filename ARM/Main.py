@@ -6,7 +6,7 @@ import subprocess
 bluetoothConnection = BluetoothConnection(port=1)
 
 servoNumber = 4
-pulseWidths = [[800, 2200], [800, 2200], [800, 2200], [1600, 2400]]
+pulseWidths = [[800, 2200], [800, 2200], [800, 2600], [1600, 2400]]
 initialAngles = [160, 110, 150, 90]
 arm = Arm(bluetoothConnection, servoNumber, pulseWidths, initialAngles)
 
@@ -18,7 +18,7 @@ GPIO.setup(shutdownPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 def shutdown():
     bluetoothConnection.close()
     GPIO.cleanup()
-    subprocess.call("sudo shutdown -h now", shell=True)
+    # subprocess.call("sudo shutdown -h now", shell=True) TODO: Uncomment.
 
 
 def buttonShutdown(channel):
