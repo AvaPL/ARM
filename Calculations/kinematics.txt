@@ -1,4 +1,4 @@
->> ARM
+>> kinematics
  
 k =
  
