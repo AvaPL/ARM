@@ -34,6 +34,7 @@
     <string name="text_position_x">x</string>
     <string name="text_position_y">y</string>
     <string name="text_angle_phi">φ</string>
+    <string name="text_default_int_value">0</string>
 
     <string name="title_connect_to_rpi">Connect to RPi</string>
     <string name="title_bluetooth_settings">Bluetooth settings</string>

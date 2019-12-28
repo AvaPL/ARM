@@ -29,6 +29,10 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     private static final String SHARED_PREFERENCES_ANGLES = "angles";
     private static final String KEY_JOINT_VALUE = "joint_value";
     private static final String KEY_GRAB_VALUE = "grab_value";
+    private static final String SHARED_PREFERENCES_KINEMATICS = "kinematics";
+    private static final String KEY_POSITION_X = "position_x";
+    private static final String KEY_POSITION_Y = "position_y";
+    private static final String KEY_ANGLE_PHI = "angle_phi";
 
     private Mode mode;
     private int currentLayout;
@@ -38,9 +42,17 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     private SeekBar grabSeekBar;
     private TextView[] jointTextViews;
 
+    private SharedPreferences kinematics;
     private TextView xPositionTextView;
     private TextView yPositionTextView;
     private TextView phiAngleTextView;
+    private ImageButton xPositionUp;
+    private ImageButton xPositionDown;
+    private ImageButton yPositionUp;
+    private ImageButton yPositionDown;
+    private ImageButton phiAngleUp;
+    private ImageButton phiAngleDown;
+
 
     private ImageButton up;
     private ImageButton down;
@@ -123,8 +135,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
 
     private void initializeAnglesSharedPreferences() {
         if (getContext() == null) return;
-        this.angles =
-                getContext().getSharedPreferences(SHARED_PREFERENCES_ANGLES, Context.MODE_PRIVATE);
+        angles = getContext().getSharedPreferences(SHARED_PREFERENCES_ANGLES, Context.MODE_PRIVATE);
     }
 
     private void loadAnglesState() {
@@ -171,6 +182,9 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
 
     private void initializeDhView() {
         initializeKinematicsTextViews();
+        initializeKinematicsButtons();
+        initializeKinematicsSharedPreferences();
+        loadKinematicsState();
     }
 
     private void initializeKinematicsTextViews() {
@@ -178,6 +192,50 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         xPositionTextView = getView().findViewById(R.id.text_position_x_value);
         yPositionTextView = getView().findViewById(R.id.text_position_y_value);
         phiAngleTextView = getView().findViewById(R.id.text_angle_phi_value);
+    }
+
+    private void initializeKinematicsButtons() {
+        if (getView() == null) return;
+        xPositionUp = getView().findViewById(R.id.button_dh_up_x);
+        xPositionDown = getView().findViewById(R.id.button_dh_down_x);
+        yPositionUp = getView().findViewById(R.id.button_dh_up_y);
+        yPositionDown = getView().findViewById(R.id.button_dh_down_y);
+        phiAngleUp = getView().findViewById(R.id.button_dh_up_phi);
+        phiAngleDown = getView().findViewById(R.id.button_dh_down_phi);
+        setKinematicsOnTouchListeners();
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void setKinematicsOnTouchListeners() {
+        int delay = getDelay();
+        xPositionUp.setOnTouchListener(
+                OnTouchListenerFactory.getIncrementValueListener(xPositionTextView, delay));
+        xPositionDown.setOnTouchListener(
+                OnTouchListenerFactory.getDecrementValueListener(xPositionTextView, delay));
+        yPositionUp.setOnTouchListener(
+                OnTouchListenerFactory.getIncrementValueListener(yPositionTextView, delay));
+        yPositionDown.setOnTouchListener(
+                OnTouchListenerFactory.getDecrementValueListener(yPositionTextView, delay));
+        phiAngleUp.setOnTouchListener(
+                OnTouchListenerFactory.getIncrementValueListener(phiAngleTextView, delay));
+        phiAngleDown.setOnTouchListener(
+                OnTouchListenerFactory.getDecrementValueListener(phiAngleTextView, delay));
+    }
+
+    private void initializeKinematicsSharedPreferences() {
+        if (getContext() == null) return;
+        kinematics = getContext()
+                .getSharedPreferences(SHARED_PREFERENCES_KINEMATICS, Context.MODE_PRIVATE);
+    }
+
+    private void loadKinematicsState() {
+        if (kinematics == null) return;
+        xPositionTextView.setText(
+                kinematics.getString(KEY_POSITION_X, getString(R.string.text_default_int_value)));
+        yPositionTextView.setText(
+                kinematics.getString(KEY_POSITION_Y, getString(R.string.text_default_int_value)));
+        phiAngleTextView.setText(
+                kinematics.getString(KEY_ANGLE_PHI, getString(R.string.text_default_int_value)));
     }
 
     private void initializeMovementButtons() {
@@ -207,9 +265,31 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        loadMode();
+        if (!isLayoutCorrect())
+            refreshLayout();
+    }
+
+    private boolean isLayoutCorrect() {
+        boolean isAnglesLayout =
+                mode == Mode.ANGLES && currentLayout == R.layout.fragment_controller;
+        boolean isDhLayout = mode == Mode.DH && currentLayout == R.layout.fragment_controller_dh;
+        return isAnglesLayout || isDhLayout;
+    }
+
+    private void refreshLayout() {
+        if (getFragmentManager() == null) return;
+        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    }
+
+    @Override
     public void onPause() {
         if (mode == Mode.ANGLES)
             anglesOnPause();
+        else
+            kinematicsOnPause();
         super.onPause();
     }
 
@@ -220,6 +300,15 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
             anglesEditor.putInt(KEY_JOINT_VALUE + "_" + i, jointSeekBars[i].getProgress());
         anglesEditor.putInt(KEY_GRAB_VALUE, grabSeekBar.getProgress());
         anglesEditor.apply();
+    }
+
+    private void kinematicsOnPause() {
+        if (kinematics == null) return;
+        SharedPreferences.Editor kinematicsEditor = kinematics.edit();
+        kinematicsEditor.putString(KEY_POSITION_X, xPositionTextView.getText().toString());
+        kinematicsEditor.putString(KEY_POSITION_Y, yPositionTextView.getText().toString());
+        kinematicsEditor.putString(KEY_ANGLE_PHI, phiAngleTextView.getText().toString());
+        kinematicsEditor.apply();
     }
 
     @Override
@@ -276,25 +365,5 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
             yPositionTextView.setText(value);
         else
             phiAngleTextView.setText(value % 360);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadMode();
-        if (!isLayoutCorrect())
-            refreshLayout();
-    }
-
-    private boolean isLayoutCorrect() {
-        boolean isAnglesLayout =
-                mode == Mode.ANGLES && currentLayout == R.layout.fragment_controller;
-        boolean isDhLayout = mode == Mode.DH && currentLayout == R.layout.fragment_controller_dh;
-        return isAnglesLayout || isDhLayout;
-    }
-
-    private void refreshLayout() {
-        if (getFragmentManager() == null) return;
-        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
     }
 }
