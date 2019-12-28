@@ -1,0 +1,32 @@
+>> kinematics
+ 
+k =
+ 
+ a*sin(q1 + q2 - theta) + a*sin(q1 - theta) - l*cos(q1 + q2 + q3)
+ a*cos(q1 + q2 - theta) + a*cos(q1 - theta) + l*sin(q1 + q2 + q3)
+                                                               q3
+ 
+ 
+J =
+ 
+[ a*cos(q1 + q2 - theta) + a*cos(q1 - theta) + l*sin(q1 + q2 + q3), a*cos(q1 + q2 - theta) + l*sin(q1 + q2 + q3), l*sin(q1 + q2 + q3)]
+[ l*cos(q1 + q2 + q3) - a*sin(q1 - theta) - a*sin(q1 + q2 - theta), l*cos(q1 + q2 + q3) - a*sin(q1 + q2 - theta), l*cos(q1 + q2 + q3)]
+[                                                                0,                                            0,                   1]
+ 
+ 
+invJ =
+ 
+[                      (a*sin(q1 + q2 - theta) - l*cos(q1 + q2 + q3))/(sin(q2)*a^2 - l*cos(q2 + q3 + theta)*a),                      (a*cos(q1 + q2 - theta) + l*sin(q1 + q2 + q3))/(sin(q2)*a^2 - l*cos(q2 + q3 + theta)*a),                         -(l*cos(q3 + theta))/(a*sin(q2) - l*cos(q2 + q3 + theta))]
+[ -(a*sin(q1 + q2 - theta) + a*sin(q1 - theta) - l*cos(q1 + q2 + q3))/(sin(q2)*a^2 - l*cos(q2 + q3 + theta)*a), -(a*cos(q1 + q2 - theta) + a*cos(q1 - theta) + l*sin(q1 + q2 + q3))/(sin(q2)*a^2 - l*cos(q2 + q3 + theta)*a), (l*(cos(q2 + q3 + theta) + cos(q3 + theta)))/(a*sin(q2) - l*cos(q2 + q3 + theta))]
+[                                                                                                            0,                                                                                                            0,                                                                                 1]
+ 
+
+singularConfigurations = 
+
+  struct with fields:
+
+    q1: [0×1 sym]
+    q2: [0×1 sym]
+    q3: [0×1 sym]
+
+No singular configurations

@@ -1,4 +1,4 @@
-package com.pawelcembaluk.armcontroller.ui.controller;
+package com.pawelcembaluk.armcontroller.ui.controller.listeners;
 
 import android.widget.SeekBar;
 import android.widget.TextView;

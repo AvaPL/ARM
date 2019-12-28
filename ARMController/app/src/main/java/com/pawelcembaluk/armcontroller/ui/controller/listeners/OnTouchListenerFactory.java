@@ -1,10 +1,13 @@
-package com.pawelcembaluk.armcontroller.ui.controller;
+package com.pawelcembaluk.armcontroller.ui.controller.listeners;
 
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import com.pawelcembaluk.armcontroller.bluetooth.BluetoothConnection;
+
+import java.util.function.IntUnaryOperator;
 
 public class OnTouchListenerFactory {
 
@@ -70,4 +73,34 @@ public class OnTouchListenerFactory {
         View.OnClickListener onClick = view -> BluetoothConnection.getInstance().send(command);
         return new RepeatListener(onClick, delayMillis);
     }
+
+    public static View.OnTouchListener getIncrementCoordinateListener(String coordinate,
+                                                                      TextView valueText,
+                                                                      int delayMillis) {
+        View.OnClickListener onClick =
+                getModifyValueOnClickListener(coordinate, valueText, i -> ++i);
+        return new RepeatListener(onClick, delayMillis);
+    }
+
+    public static View.OnTouchListener getDecrementCoordinateListener(String coordinate,
+                                                                      TextView valueText,
+                                                                      int delayMillis) {
+        View.OnClickListener onClick =
+                getModifyValueOnClickListener(coordinate, valueText, i -> --i);
+        return new RepeatListener(onClick, delayMillis);
+    }
+
+    private static View.OnClickListener getModifyValueOnClickListener(String coordinate,
+                                                                      TextView valueText,
+                                                                      IntUnaryOperator operation) {
+        return view -> {
+            int value = Integer.parseInt(valueText.getText().toString());
+            int modifiedValue = operation.applyAsInt(value);
+            valueText.setText(Integer.toString(modifiedValue));
+            BluetoothConnection.getInstance()
+                               .send("coordinate " + coordinate + " " + modifiedValue);
+        };
+    }
+
+
 }

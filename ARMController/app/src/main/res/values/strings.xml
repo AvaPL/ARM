@@ -8,6 +8,7 @@
     <string name="menu_devices">Devices</string>
     <string name="menu_settings">Settings</string>
 
+    <string name="preference_title_dh_mode">DH mode</string>
     <string name="preference_title_continuous_commands_delay">Continuous commands delay</string>
     <string name="preference_key_build_version">build_version</string>
     <string name="preference_title_build_version">Build version</string>
@@ -30,6 +31,10 @@
     <string name="text_no_device_selected">No device selected</string>
     <string name="text_no_devices_found">No Bluetooth devices found.</string>
     <string name="text_not_connected">Not connected</string>
+    <string name="text_position_x">x</string>
+    <string name="text_position_y">y</string>
+    <string name="text_angle_phi">φ</string>
+    <string name="text_default_int_value">0</string>
 
     <string name="title_connect_to_rpi">Connect to RPi</string>
     <string name="title_bluetooth_settings">Bluetooth settings</string>
