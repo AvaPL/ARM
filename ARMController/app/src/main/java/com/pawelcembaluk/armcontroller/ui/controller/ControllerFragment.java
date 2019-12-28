@@ -22,6 +22,8 @@ import com.pawelcembaluk.armcontroller.bluetooth.BluetoothConnection;
 import com.pawelcembaluk.armcontroller.interfaces.ConnectionObserver;
 import com.pawelcembaluk.armcontroller.interfaces.DataReceivedObserver;
 import com.pawelcembaluk.armcontroller.ui.controller.enums.Mode;
+import com.pawelcembaluk.armcontroller.ui.controller.listeners.OnSeekBarChangeListenerFactory;
+import com.pawelcembaluk.armcontroller.ui.controller.listeners.OnTouchListenerFactory;
 import com.pawelcembaluk.armcontroller.ui.settings.SettingsFragment;
 
 public class ControllerFragment extends Fragment implements ConnectionObserver, DataReceivedObserver {
@@ -208,18 +210,24 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     @SuppressLint("ClickableViewAccessibility")
     private void setKinematicsOnTouchListeners() {
         int delay = getDelay();
-        xPositionUp.setOnTouchListener(
-                OnTouchListenerFactory.getIncrementValueListener(xPositionTextView, delay));
-        xPositionDown.setOnTouchListener(
-                OnTouchListenerFactory.getDecrementValueListener(xPositionTextView, delay));
-        yPositionUp.setOnTouchListener(
-                OnTouchListenerFactory.getIncrementValueListener(yPositionTextView, delay));
-        yPositionDown.setOnTouchListener(
-                OnTouchListenerFactory.getDecrementValueListener(yPositionTextView, delay));
-        phiAngleUp.setOnTouchListener(
-                OnTouchListenerFactory.getIncrementValueListener(phiAngleTextView, delay));
-        phiAngleDown.setOnTouchListener(
-                OnTouchListenerFactory.getDecrementValueListener(phiAngleTextView, delay));
+        xPositionUp.setOnTouchListener(OnTouchListenerFactory.getIncrementCoordinateListener("x",
+                                                                                             xPositionTextView,
+                                                                                             delay));
+        xPositionDown.setOnTouchListener(OnTouchListenerFactory.getDecrementCoordinateListener("x",
+                                                                                               xPositionTextView,
+                                                                                               delay));
+        yPositionUp.setOnTouchListener(OnTouchListenerFactory.getIncrementCoordinateListener("y",
+                                                                                             yPositionTextView,
+                                                                                             delay));
+        yPositionDown.setOnTouchListener(OnTouchListenerFactory.getDecrementCoordinateListener("y",
+                                                                                               yPositionTextView,
+                                                                                               delay));
+        phiAngleUp.setOnTouchListener(OnTouchListenerFactory.getIncrementCoordinateListener("phi",
+                                                                                            phiAngleTextView,
+                                                                                            delay));
+        phiAngleDown.setOnTouchListener(OnTouchListenerFactory.getDecrementCoordinateListener("phi",
+                                                                                              phiAngleTextView,
+                                                                                              delay));
     }
 
     private void initializeKinematicsSharedPreferences() {

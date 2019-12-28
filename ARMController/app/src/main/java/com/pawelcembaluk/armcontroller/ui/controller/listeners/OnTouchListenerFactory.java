@@ -1,4 +1,4 @@
-package com.pawelcembaluk.armcontroller.ui.controller;
+package com.pawelcembaluk.armcontroller.ui.controller.listeners;
 
 import android.os.Handler;
 import android.view.MotionEvent;
@@ -74,24 +74,31 @@ public class OnTouchListenerFactory {
         return new RepeatListener(onClick, delayMillis);
     }
 
-    public static View.OnTouchListener getIncrementValueListener(TextView valueText,
-                                                                 int delayMillis) {
-        View.OnClickListener onClick = getModifyValueOnClickListener(valueText, i -> ++i);
+    public static View.OnTouchListener getIncrementCoordinateListener(String coordinate,
+                                                                      TextView valueText,
+                                                                      int delayMillis) {
+        View.OnClickListener onClick =
+                getModifyValueOnClickListener(coordinate, valueText, i -> ++i);
         return new RepeatListener(onClick, delayMillis);
     }
 
-    public static View.OnTouchListener getDecrementValueListener(TextView valueText,
-                                                                 int delayMillis) {
-        View.OnClickListener onClick = getModifyValueOnClickListener(valueText, i -> --i);
+    public static View.OnTouchListener getDecrementCoordinateListener(String coordinate,
+                                                                      TextView valueText,
+                                                                      int delayMillis) {
+        View.OnClickListener onClick =
+                getModifyValueOnClickListener(coordinate, valueText, i -> --i);
         return new RepeatListener(onClick, delayMillis);
     }
 
-    private static View.OnClickListener getModifyValueOnClickListener(TextView valueText,
+    private static View.OnClickListener getModifyValueOnClickListener(String coordinate,
+                                                                      TextView valueText,
                                                                       IntUnaryOperator operation) {
         return view -> {
             int value = Integer.parseInt(valueText.getText().toString());
-            String decrementedValueString = Integer.toString(operation.applyAsInt(value));
-            valueText.setText(decrementedValueString);
+            int modifiedValue = operation.applyAsInt(value);
+            valueText.setText(Integer.toString(modifiedValue));
+            BluetoothConnection.getInstance()
+                               .send("coordinate " + coordinate + " " + modifiedValue);
         };
     }
 
