@@ -7,4 +7,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="dpad_spacing">50dp</dimen>
     <dimen name="dpad_size_button">100dp</dimen>
+    <dimen name="dh_size_button">50dp</dimen>
 </resources>

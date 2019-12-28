@@ -11,7 +11,7 @@
             android:layout_height="@dimen/dpad_size_button"
             android:layout_marginBottom="@dimen/dpad_spacing"
             android:contentDescription="@string/image_description_up_arrow"
-            app:layout_constraintBottom_toTopOf="@+id/guideline_horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/guideline_navigation"
             app:layout_constraintEnd_toStartOf="@+id/button_right"
             app:layout_constraintStart_toEndOf="@+id/button_left"
             app:srcCompat="@drawable/ic_controller_arrow_up" />
@@ -24,7 +24,7 @@
             android:contentDescription="@string/image_description_down_arrow"
             app:layout_constraintEnd_toStartOf="@+id/button_right"
             app:layout_constraintStart_toEndOf="@+id/button_left"
-            app:layout_constraintTop_toTopOf="@+id/guideline_horizontal"
+            app:layout_constraintTop_toTopOf="@+id/guideline_navigation"
             app:srcCompat="@drawable/ic_controller_arrow_down" />
 
     <ImageButton
@@ -50,7 +50,7 @@
             app:srcCompat="@drawable/ic_controller_arrow_right" />
 
     <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_horizontal"
+            android:id="@+id/guideline_navigation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
