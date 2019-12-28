@@ -18,7 +18,8 @@ GPIO.setup(shutdownPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 def shutdown():
     bluetoothConnection.close()
     GPIO.cleanup()
-    # subprocess.call("sudo shutdown -h now", shell=True) TODO: Uncomment.
+    # subprocess.call("sudo shutdown -h now", shell=True) TODO: Uncomment, debug only.
+    print("REMEMBER TO SHUTDOWN MANUALLY, THIS IS DEBUG ONLY SHUTDOWN")  # TODO: Remove, debug only.
 
 
 def buttonShutdown(channel):

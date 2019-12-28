@@ -41,10 +41,14 @@ class Arm:
         splitCommand = command.split(' ')
         if command == "angles":
             self.sendAngles()
+        elif command == "kinematics":
+            pass  # TODO: Implement sending kinematics.
         elif self.isNavigationCommand(command):
             pass  # TODO: Implement movement.
         elif splitCommand[0] == "angle":
             self.changeAngle(splitCommand)
+        elif splitCommand[0] == "coordinate":
+            pass  # TODO: Implement interpreting coordinates.
         else:
             self.sendUnknownCommand()
 
