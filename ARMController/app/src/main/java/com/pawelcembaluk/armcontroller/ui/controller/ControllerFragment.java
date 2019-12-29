@@ -43,9 +43,9 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     private int currentLayout;
 
     private SharedPreferences angles;
-    private SeekBar[] jointSeekBars;
+    private SeekBar[] jointSeekBars = new SeekBar[3];
     private SeekBar grabSeekBar;
-    private TextView[] jointTextViews;
+    private TextView[] jointTextViews = new TextView[3];
 
     private SharedPreferences kinematics;
     private TextView xPositionTextView;
@@ -90,9 +90,10 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
 
     private void queryCurrentArmState() {
         if (mode == Mode.ANGLES)
-            BluetoothConnection.getInstance().send("angles");
+            BluetoothConnection.getInstance().send("joints");
         else
             BluetoothConnection.getInstance().send("kinematics");
+        BluetoothConnection.getInstance().send("grab");
     }
 
     @Override
@@ -123,16 +124,19 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
 
     private void initializeSeekBars() {
         if (getView() == null) return;
-        jointSeekBars = new SeekBar[3];
         jointSeekBars[0] = getView().findViewById(R.id.seek_bar_joint_0);
         jointSeekBars[1] = getView().findViewById(R.id.seek_bar_joint_1);
         jointSeekBars[2] = getView().findViewById(R.id.seek_bar_joint_2);
+        initializeGrabSeekBar();
+    }
+
+    private void initializeGrabSeekBar() {
+        if (getView() == null) return;
         grabSeekBar = getView().findViewById(R.id.seek_bar_grab);
     }
 
     private void initializeJointTextViews() {
         if (getView() == null) return;
-        jointTextViews = new TextView[3];
         jointTextViews[0] = getView().findViewById(R.id.text_joint_0);
         jointTextViews[1] = getView().findViewById(R.id.text_joint_1);
         jointTextViews[2] = getView().findViewById(R.id.text_joint_2);
@@ -188,6 +192,8 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     private void initializeDhView() {
         initializeKinematicsTextViews();
         initializeKinematicsButtons();
+        initializeGrabSeekBar();
+        setGrabListener();
         initializeKinematicsSharedPreferences();
         loadKinematicsState();
     }
@@ -247,6 +253,8 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
                 kinematics.getString(KEY_POSITION_Y, getString(R.string.text_default_int_value)));
         phiAngleTextView.setText(
                 kinematics.getString(KEY_ANGLE_PHI, getString(R.string.text_default_int_value)));
+        int grabValue = kinematics.getInt(KEY_GRAB_VALUE, 0);
+        grabSeekBar.setProgress(grabValue);
     }
 
     private void initializeMovementButtons() {
@@ -320,6 +328,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         kinematicsEditor.putString(KEY_POSITION_X, xPositionTextView.getText().toString());
         kinematicsEditor.putString(KEY_POSITION_Y, yPositionTextView.getText().toString());
         kinematicsEditor.putString(KEY_ANGLE_PHI, phiAngleTextView.getText().toString());
+        kinematicsEditor.putInt(KEY_GRAB_VALUE, grabSeekBar.getProgress());
         kinematicsEditor.apply();
     }
 
@@ -346,9 +355,9 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     @Override
     public void onDataReceived(String command) {
         String[] commandSplit = command.split(" ");
-        if (commandSplit[0].equals("angle") && mode == Mode.ANGLES)
+        if (commandSplit[0].equals("angle"))
             setAngle(commandSplit);
-        else if (commandSplit[0].equals("coordinate") && mode == Mode.DH)
+        else if (commandSplit[0].equals("coordinate"))
             setCoordinate(commandSplit);
         else
             Toast.makeText(getContext(), command.trim(), Toast.LENGTH_SHORT).show();
@@ -357,12 +366,12 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     private void setAngle(String[] commandSplit) {
         int angle = Integer.parseInt(commandSplit[2]);
         if (!isAngleCorrect(angle)) return;
-        if (commandSplit[1].equals("grab")) {
+        if (commandSplit[1].equals("grab"))
             grabSeekBar.setProgress(angle);
-            return;
+        else {
+            int index = Integer.parseInt(commandSplit[1]);
+            jointSeekBars[index].setProgress(angle);
         }
-        int index = Integer.parseInt(commandSplit[1]);
-        jointSeekBars[index].setProgress(angle);
     }
 
     private boolean isAngleCorrect(int angle) {

@@ -40,8 +40,10 @@ class Arm:
 
     def processCommand(self, command):
         splitCommand = command.split(' ')
-        if command == "angles":
-            self.sendAngles()
+        if command == "joints":
+            self.sendJoints()
+        elif command == "grab":
+            self.sendGrab()
         elif command == "kinematics":
             self.sendKinematics()
         elif self.isNavigationCommand(command):
@@ -53,10 +55,10 @@ class Arm:
         else:
             self.sendUnknownCommand()
 
-    def sendAngles(self):
+    def sendJoints(self):
         for index in range(self.servoNumber - 1):
             self.bluetoothConnection.writeData(self.getJointAngleCommand(index))
-        self.bluetoothConnection.writeData(self.getGrabAngleCommand())
+        self.sendGrab()
 
     def getJointAngleCommand(self, index):
         angle = round(self.getAngle(index))
@@ -68,6 +70,9 @@ class Arm:
 
     def correctAngle(self, angle, index):
         return angle if index % 2 != 0 else 180 - angle
+
+    def sendGrab(self):
+        self.bluetoothConnection.writeData(self.getGrabAngleCommand())
 
     def getGrabAngleCommand(self):
         servoIndex = self.servoNumber - 1
