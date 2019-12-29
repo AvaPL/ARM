@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,8 @@ import com.pawelcembaluk.armcontroller.ui.controller.enums.Mode;
 import com.pawelcembaluk.armcontroller.ui.controller.listeners.OnSeekBarChangeListenerFactory;
 import com.pawelcembaluk.armcontroller.ui.controller.listeners.OnTouchListenerFactory;
 import com.pawelcembaluk.armcontroller.ui.settings.SettingsFragment;
+
+import java.util.Arrays;
 
 public class ControllerFragment extends Fragment implements ConnectionObserver, DataReceivedObserver {
 
@@ -290,6 +293,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     private void refreshLayout() {
         if (getFragmentManager() == null) return;
         getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+        queryCurrentArmState();
     }
 
     @Override
@@ -366,12 +370,12 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     }
 
     private void setCoordinate(String[] commandSplit) {
-        int value = Integer.parseInt(commandSplit[2]);
+        String value = commandSplit[2];
         if (commandSplit[1].equals("x"))
             xPositionTextView.setText(value);
         else if (commandSplit[1].equals("y"))
             yPositionTextView.setText(value);
         else
-            phiAngleTextView.setText(value % 360);
+            phiAngleTextView.setText(value);
     }
 }
