@@ -8,7 +8,7 @@ from exceptions.NotReachableException import NotReachableException
 class ArmKinematics:
     XI = 0.9
     MAX_INVERSE_KINEMATICS_ITERATIONS = 200
-    MAX_INVERSE_KINEMATICS_ERROR = np.linalg.norm(np.array(([radians(1), radians(1), radians(1)])))
+    MAX_INVERSE_KINEMATICS_ERROR = np.linalg.norm(np.array(([0.01, 0.01, radians(0.1)])))
 
     def __init__(self, q1, q2, q3):
         self.q1 = radians(q1)
