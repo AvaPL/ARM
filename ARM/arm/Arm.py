@@ -1,6 +1,6 @@
 from adafruit_servokit import ServoKit
 
-from ArmKinematics import ArmKinematics
+from arm.ArmKinematics import ArmKinematics
 
 
 class Arm:
