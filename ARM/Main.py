@@ -10,6 +10,9 @@ pulseWidths = [[500, 2600], [500, 2600], [500, 2600], [1800, 2600]]
 initialAngles = [160, 110, 150, 90]
 arm = Arm(servoNumber, pulseWidths, initialAngles)
 
+GPIO.setmode(GPIO.BCM)
+# TODO: Initialize motors here.
+
 mobilePlatform = None
 
 commandInterpreter = CommandInterpreter(bluetoothConnection, arm, mobilePlatform)
