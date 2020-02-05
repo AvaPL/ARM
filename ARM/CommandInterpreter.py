@@ -12,8 +12,7 @@ class CommandInterpreter:
         self.mobilePlatform = mobilePlatform
 
     def readCommands(self):
-        # returns True if the arm received a shutdown command
-        # and False if the client disconnected
+        # Returns True if a shutdown command was received and False if the client disconnected.
         try:
             return self.readUntilShutdown()
         except BluetoothError:
@@ -66,7 +65,7 @@ class CommandInterpreter:
         return "angle grab " + str(angle)
 
     def sendKinematics(self):
-        coordinates = self.arm.kinematics.getRoundedKinematics()
+        coordinates = self.arm.kinematics.getCorrectedKinematics()
         x = coordinates[0][0]
         y = coordinates[1][0]
         phi = coordinates[2][0]
@@ -75,7 +74,8 @@ class CommandInterpreter:
         self.bluetoothConnection.writeData(self.getCoordinateCommand("phi", phi))
 
     def getCoordinateCommand(self, coordinate, value):
-        return "coordinate " + coordinate + " " + str(value)
+        roundedValue = round(value.item())
+        return "coordinate " + coordinate + " " + str(roundedValue)
 
     def isNavigationCommand(self, command):
         navigationCommands = ["forward", "back", "left", "right"]

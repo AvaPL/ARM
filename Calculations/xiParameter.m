@@ -13,10 +13,9 @@ for i = 1:length(xi)
         q = [0;0;0];
         k = calculateKinematics(q, theta, a, lenE);
         iterations = 1;
-        % Iterate until error norm is equal to error of 1 degree on each
-        % coordinate norm. Assumes that 1000 iterations mean that point is
-        % unreachable.
-        while(norm(xf-k) > norm([0.1;0.1;deg2rad(0.1)]) && iterations < 1000)
+        % Iterate until error is tolerable. Assumes that 1000 iterations 
+        % mean that point is unreachable.
+        while(~isErrorTolerable(xf, k) && iterations < 1000)
             invJ = calculateJacobianInverse(q, theta, a, lenE);
             q = q + xi(i)*invJ*(xf-k);
             k = calculateKinematics(q, theta, a, lenE);
@@ -36,6 +35,11 @@ function k = calculateKinematics(q, theta, a, lenE)
     k = [a*sin(q(1) + q(2) - theta) + a*sin(q(1) - theta) - lenE*cos(q(1) + q(2) + q(3));
             a*cos(q(1) + q(2) - theta) + a*cos(q(1) - theta) + lenE*sin(q(1) + q(2) + q(3));
             q(3)];
+end
+
+function r = isErrorTolerable(xf, k)
+    error = xf-k;
+    r = error(1) < 1 && error(2) < 1 && error(3) < deg2rad(1);
 end
 
 function invJ = calculateJacobianInverse(q, theta, a, lenE)

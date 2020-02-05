@@ -25,7 +25,7 @@ class BluetoothConnection:
         self.clientSocket.send(encodedData)
 
     def close(self):
-        if 'clientSocket' in globals(): #TODO: Check if globals check is needed (maybe None check is enough).
+        if self.clientSocket is not None:
             self.clientSocket.close()
         self.serverSocket.close()
         print("Sockets closed")
