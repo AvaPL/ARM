@@ -1,26 +1,18 @@
-from adafruit_servokit import ServoKit
 from bluetooth import BluetoothError
 
-from ArmKinematics import ArmKinematics
 from connection.BufferedData import BufferedData
 from exceptions.NotReachableException import NotReachableException
 
 
-class Arm:
-    def __init__(self, bluetoothConnection, servoNumber, pulseWidths, initialAngles):
+class CommandInterpreter:
+    def __init__(self, bluetoothConnection, arm, mobilePlatform):
         self.bluetoothConnection = bluetoothConnection
         self.bufferedData = BufferedData()
-        self.servoNumber = servoNumber
-        self.servoKit = ServoKit(channels=16)
-        for index in range(servoNumber):
-            servo = self.servoKit.servo[index]
-            servo.set_pulse_width_range(pulseWidths[index][0], pulseWidths[index][1])
-            servo.angle = initialAngles[index]
-        self.kinematics = ArmKinematics(q1=self.getAngle(0), q2=self.getAngle(1), q3=self.getAngle(2))
+        self.arm = arm
+        self.mobilePlatform = mobilePlatform
 
     def readCommands(self):
-        # returns True if the arm received a shutdown command
-        # and False if the client disconnected
+        # Returns True if a shutdown command was received and False if the client disconnected.
         try:
             return self.readUntilShutdown()
         except BluetoothError:
@@ -56,31 +48,24 @@ class Arm:
             self.sendUnknownCommand()
 
     def sendJoints(self):
-        for index in range(self.servoNumber - 1):
+        for index in range(self.arm.servoNumber - 1):
             self.bluetoothConnection.writeData(self.getJointAngleCommand(index))
         self.sendGrab()
 
     def getJointAngleCommand(self, index):
-        angle = round(self.getAngle(index))
+        angle = round(self.arm.getAngle(index))
         return "angle " + str(index) + " " + str(angle)
-
-    def getAngle(self, servoIndex):
-        angle = self.servoKit.servo[servoIndex].angle
-        return self.correctAngle(angle, servoIndex)
-
-    def correctAngle(self, angle, index):
-        return angle if index % 2 != 0 else 180 - angle
 
     def sendGrab(self):
         self.bluetoothConnection.writeData(self.getGrabAngleCommand())
 
     def getGrabAngleCommand(self):
-        servoIndex = self.servoNumber - 1
-        angle = round(self.getAngle(servoIndex))
+        servoIndex = self.arm.servoNumber - 1
+        angle = round(self.arm.getAngle(servoIndex))
         return "angle grab " + str(angle)
 
     def sendKinematics(self):
-        coordinates = self.kinematics.getRoundedKinematics()
+        coordinates = self.arm.kinematics.getCorrectedKinematics()
         x = coordinates[0][0]
         y = coordinates[1][0]
         phi = coordinates[2][0]
@@ -89,7 +74,8 @@ class Arm:
         self.bluetoothConnection.writeData(self.getCoordinateCommand("phi", phi))
 
     def getCoordinateCommand(self, coordinate, value):
-        return "coordinate " + coordinate + " " + str(value)
+        roundedValue = round(value.item())
+        return "coordinate " + coordinate + " " + str(roundedValue)
 
     def isNavigationCommand(self, command):
         navigationCommands = ["forward", "back", "left", "right"]
@@ -98,32 +84,15 @@ class Arm:
     def changeAngle(self, splitCommand):
         servoIndex = int(splitCommand[1])
         angle = int(splitCommand[2])
-        if 0 <= angle <= 180:
-            self.servoKit.servo[servoIndex].angle = self.correctAngle(angle, servoIndex)
-            if servoIndex < 3:  # Prevents updating kinematics for grab servo.
-                self.updateKinematics()
-
-    def updateKinematics(self):
-        self.kinematics.setConfiguration(q1=self.getAngle(0), q2=self.getAngle(1), q3=self.getAngle(2))
+        self.arm.changeAngle(servoIndex, angle)
 
     def changeCoordinates(self, splitCommand):
         coordinate = splitCommand[1]
         value = int(splitCommand[2])
         try:
-            if coordinate == "x":
-                self.kinematics.changeXPosition(value)
-            elif coordinate == "y":
-                self.kinematics.changeYPosition(value)
-            else:
-                self.kinematics.changePhiAngle(value)
-            self.updateAngles()
+            self.arm.changeCoordinates(coordinate, value)
         except NotReachableException:
             self.sendKinematics()
-
-    def updateAngles(self):
-        configuration = self.kinematics.getRoundedConfiguration()
-        for i in range(3):
-            self.servoKit.servo[i].angle = self.correctAngle(configuration[i][0], i)
 
     def sendUnknownCommand(self):
         self.bluetoothConnection.writeData("Unknown command")

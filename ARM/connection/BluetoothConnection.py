@@ -5,8 +5,8 @@ class BluetoothConnection:
     def __init__(self, port):
         self.serverSocket = BluetoothSocket(RFCOMM)
         self.port = port
-        self.serverSocket.bind(("", self.port))
-        self.serverSocket.listen(self.port)
+        self.serverSocket.bind(("", port))
+        self.serverSocket.listen(port)
         self.clientSocket = None
         self.newline = '\n'
 
@@ -25,7 +25,7 @@ class BluetoothConnection:
         self.clientSocket.send(encodedData)
 
     def close(self):
-        if 'clientSocket' in globals():
+        if self.clientSocket is not None:
             self.clientSocket.close()
         self.serverSocket.close()
         print("Sockets closed")

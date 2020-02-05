@@ -8,7 +8,8 @@ from exceptions.NotReachableException import NotReachableException
 class ArmKinematics:
     XI = 0.9
     MAX_INVERSE_KINEMATICS_ITERATIONS = 200
-    MAX_INVERSE_KINEMATICS_ERROR = np.linalg.norm(np.array(([radians(1), radians(1), radians(1)])))
+    MAX_INVERSE_KINEMATICS_ERROR_POSITION = 1
+    MAX_INVERSE_KINEMATICS_ERROR_ANGLE = radians(1)
 
     def __init__(self, q1, q2, q3):
         self.q1 = radians(q1)
@@ -28,13 +29,13 @@ class ArmKinematics:
     def changeXPosition(self, x):
         configuration = self.getConfiguration()
         y = self.getY(configuration)
-        phi = configuration[2][0]
+        phi = self.q3
         self.changeCoordinates(x, y, phi)
 
     def changeYPosition(self, y):
         configuration = self.getConfiguration()
         x = self.getX(configuration)
-        phi = configuration[2][0]
+        phi = self.q3
         self.changeCoordinates(x, y, phi)
 
     def changePhiAngle(self, phi):
@@ -59,7 +60,14 @@ class ArmKinematics:
     def shouldCalculateInverseKinematicsAgain(self, k, xf, iterations):
         if iterations > self.MAX_INVERSE_KINEMATICS_ITERATIONS:
             raise NotReachableException("Coordinates not reachable")
-        return np.linalg.norm(xf - k) > self.MAX_INVERSE_KINEMATICS_ERROR
+        return not self.isErrorTolerable(k, xf)
+
+    def isErrorTolerable(self, k, xf):
+        error = np.abs(xf - k)
+        xError = error[0][0]
+        yError = error[1][0]
+        phiError = error[2][0]
+        return xError < self.MAX_INVERSE_KINEMATICS_ERROR_POSITION and yError < self.MAX_INVERSE_KINEMATICS_ERROR_POSITION and phiError < self.MAX_INVERSE_KINEMATICS_ERROR_ANGLE
 
     def getConfiguration(self):
         return np.array([[self.q1], [self.q2], [self.q3]])
@@ -116,16 +124,15 @@ class ArmKinematics:
         else:
             raise NotReachableException("Coordinates not reachable")
 
-    def getRoundedKinematics(self):
+    def getCorrectedKinematics(self):
         configuration = self.getConfiguration()
-        x = round(self.getX(configuration))
-        y = round(self.getY(configuration))
-        phi = round(degrees(self.q3)) % 360
+        x = self.getX(configuration)
+        y = self.getY(configuration)
+        phi = degrees(self.q3) % 360
         return np.array([[x], [y], [phi]])
 
-    def getRoundedConfiguration(self):
-        configuration = self.getConfiguration()
-        q1 = round(degrees(configuration[0][0])) % 360
-        q2 = round(degrees(configuration[1][0])) % 360
-        q3 = round(degrees(configuration[2][0])) % 360
+    def getCorrectedConfiguration(self):
+        q1 = degrees(self.q1) % 360
+        q2 = degrees(self.q2) % 360
+        q3 = degrees(self.q3) % 360
         return np.array([[q1], [q2], [q3]])
