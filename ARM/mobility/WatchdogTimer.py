@@ -22,3 +22,6 @@ class WatchdogTimer(Thread):
 
     def reset(self):
         self.resetEvent.set()
+
+    def isActive(self):
+        return self.startEvent.isSet()

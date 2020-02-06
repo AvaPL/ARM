@@ -2,9 +2,8 @@ import RPi.GPIO as GPIO
 from enum import IntEnum
 
 
-# TODO: Add max speed control.
 class Motor:
-    PWM_FREQUENCY = 20000
+    PWM_FREQUENCY = 10000
 
     class Direction(IntEnum):
         FORWARD = 0

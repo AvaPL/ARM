@@ -38,12 +38,22 @@ class CommandInterpreter:
             self.sendGrab()
         elif command == "kinematics":
             self.sendKinematics()
-        elif self.isNavigationCommand(command):
-            pass  # TODO: Implement movement.
+        elif command == "forward":
+            self.mobilePlatform.forward()
+        elif command == "back":
+            self.mobilePlatform.back()
+        elif command == "left":
+            self.mobilePlatform.left()
+        elif command == "right":
+            self.mobilePlatform.right()
+        elif command == "stop": # TODO: Implement in controller app.
+            self.mobilePlatform.stop()
         elif splitCommand[0] == "angle":
             self.changeAngle(splitCommand)
         elif splitCommand[0] == "coordinate":
             self.changeCoordinates(splitCommand)
+        elif splitCommand[0] == "speed": # TODO: Implement in controller app.
+            self.changeSpeed(splitCommand)
         else:
             self.sendUnknownCommand()
 
@@ -93,6 +103,10 @@ class CommandInterpreter:
             self.arm.changeCoordinates(coordinate, value)
         except NotReachableException:
             self.sendKinematics()
+
+    def changeSpeed(self, splitCommand):
+        speed = int(splitCommand[1])
+        self.mobilePlatform.setSpeed(speed)
 
     def sendUnknownCommand(self):
         self.bluetoothConnection.writeData("Unknown command")
