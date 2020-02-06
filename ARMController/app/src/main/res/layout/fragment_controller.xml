@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -16,15 +17,15 @@
             app:srcCompat="@drawable/ic_controller_arrow_up" />
 
     <ImageButton
-        android:id="@+id/button_down"
-        android:layout_width="@dimen/dpad_size_button"
-        android:layout_height="@dimen/dpad_size_button"
-        android:layout_marginTop="@dimen/dpad_spacing"
-        android:contentDescription="@string/image_description_down_arrow"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline_navigation"
-        app:srcCompat="@drawable/ic_controller_arrow_down" />
+            android:id="@+id/button_down"
+            android:layout_width="@dimen/dpad_size_button"
+            android:layout_height="@dimen/dpad_size_button"
+            android:layout_marginTop="@dimen/dpad_spacing"
+            android:contentDescription="@string/image_description_down_arrow"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline_navigation"
+            app:srcCompat="@drawable/ic_controller_arrow_down" />
 
     <ImageButton
             android:id="@+id/button_left"
@@ -49,152 +50,181 @@
             app:srcCompat="@drawable/ic_controller_arrow_right" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_navigation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.75" />
+            android:id="@+id/guideline_navigation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.7" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
+            android:id="@+id/guideline_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
 
 
     <SeekBar
-        android:id="@+id/seek_bar_joint_0"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:max="180"
-        app:layout_constraintBottom_toTopOf="@+id/seek_bar_joint_1"
-        app:layout_constraintEnd_toStartOf="@+id/text_joint_0"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintHorizontal_weight="91"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/seek_bar_joint_0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:max="180"
+            app:layout_constraintBottom_toTopOf="@+id/seek_bar_joint_1"
+            app:layout_constraintEnd_toStartOf="@+id/text_joint_0"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="91"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <SeekBar
-        android:id="@+id/seek_bar_joint_1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:max="180"
-        app:layout_constraintBottom_toTopOf="@+id/seek_bar_joint_2"
-        app:layout_constraintEnd_toStartOf="@+id/text_joint_1"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintHorizontal_weight="91"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seek_bar_joint_0" />
+            android:id="@+id/seek_bar_joint_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:max="180"
+            app:layout_constraintBottom_toTopOf="@+id/seek_bar_joint_2"
+            app:layout_constraintEnd_toStartOf="@+id/text_joint_1"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="91"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/seek_bar_joint_0" />
 
     <SeekBar
-        android:id="@+id/seek_bar_joint_2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:max="180"
-        app:layout_constraintBottom_toTopOf="@+id/seek_bar_grab"
-        app:layout_constraintEnd_toStartOf="@+id/text_joint_2"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintHorizontal_weight="91"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seek_bar_joint_1" />
+            android:id="@+id/seek_bar_joint_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:max="180"
+            app:layout_constraintBottom_toTopOf="@+id/seek_bar_grab"
+            app:layout_constraintEnd_toStartOf="@+id/text_joint_2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="91"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/seek_bar_joint_1" />
 
     <TextView
-        android:id="@+id/text_joint_0"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="32dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/seek_bar_joint_0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintHorizontal_weight="9"
-        app:layout_constraintStart_toEndOf="@+id/seek_bar_joint_0"
-        app:layout_constraintTop_toTopOf="@+id/seek_bar_joint_0" />
+            android:id="@+id/text_joint_0"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="32dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/seek_bar_joint_0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="9"
+            app:layout_constraintStart_toEndOf="@+id/seek_bar_joint_0"
+            app:layout_constraintTop_toTopOf="@+id/seek_bar_joint_0" />
 
     <TextView
-        android:id="@+id/text_joint_1"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="32dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/seek_bar_joint_1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintHorizontal_weight="9"
-        app:layout_constraintStart_toEndOf="@+id/seek_bar_joint_1"
-        app:layout_constraintTop_toTopOf="@+id/seek_bar_joint_1" />
+            android:id="@+id/text_joint_1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="32dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/seek_bar_joint_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="9"
+            app:layout_constraintStart_toEndOf="@+id/seek_bar_joint_1"
+            app:layout_constraintTop_toTopOf="@+id/seek_bar_joint_1" />
 
     <TextView
-        android:id="@+id/text_joint_2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="32dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/seek_bar_joint_2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintHorizontal_weight="9"
-        app:layout_constraintStart_toEndOf="@+id/seek_bar_joint_2"
-        app:layout_constraintTop_toTopOf="@+id/seek_bar_joint_2" />
+            android:id="@+id/text_joint_2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="32dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/seek_bar_joint_2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="9"
+            app:layout_constraintStart_toEndOf="@+id/seek_bar_joint_2"
+            app:layout_constraintTop_toTopOf="@+id/seek_bar_joint_2" />
 
 
     <SeekBar
-        android:id="@+id/seek_bar_grab"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:max="180"
-        app:layout_constraintBottom_toTopOf="@+id/button_up"
-        app:layout_constraintEnd_toStartOf="@+id/text_grab"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintHorizontal_weight="30"
-        app:layout_constraintStart_toEndOf="@+id/text_release"
-        app:layout_constraintTop_toBottomOf="@+id/seek_bar_joint_2" />
+            android:id="@+id/seek_bar_grab"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:max="180"
+            app:layout_constraintBottom_toTopOf="@+id/button_up"
+            app:layout_constraintEnd_toStartOf="@+id/text_grab"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="30"
+            app:layout_constraintStart_toEndOf="@+id/text_release"
+            app:layout_constraintTop_toBottomOf="@+id/seek_bar_joint_2" />
 
     <TextView
-        android:id="@+id/text_release"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="32dp"
-        android:outlineProvider="bounds"
-        android:text="@string/text_release"
-        android:textAlignment="center"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/seek_bar_grab"
-        app:layout_constraintEnd_toStartOf="@+id/seek_bar_grab"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintHorizontal_weight="10"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/seek_bar_grab"
-        app:layout_constraintVertical_bias="0.0" />
+            android:id="@+id/text_release"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="32dp"
+            android:outlineProvider="bounds"
+            android:text="@string/text_release"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/seek_bar_grab"
+            app:layout_constraintEnd_toStartOf="@+id/seek_bar_grab"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="10"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/seek_bar_grab"
+            app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/text_grab"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="32dp"
-        android:text="@string/text_grab"
-        android:textAlignment="center"
-        android:textColor="@color/colorText"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/seek_bar_grab"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintHorizontal_weight="10"
-        app:layout_constraintStart_toEndOf="@+id/seek_bar_grab"
-        app:layout_constraintTop_toTopOf="@+id/seek_bar_grab" />
+            android:id="@+id/text_grab"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="32dp"
+            android:text="@string/text_grab"
+            android:textAlignment="center"
+            android:textColor="@color/colorText"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/seek_bar_grab"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="10"
+            app:layout_constraintStart_toEndOf="@+id/seek_bar_grab"
+            app:layout_constraintTop_toTopOf="@+id/seek_bar_grab" />
+
+    <TextView
+            android:id="@+id/text_speed"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="32dp"
+            android:outlineProvider="bounds"
+            android:text="@string/text_speed"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/seek_bar_speed"
+            app:layout_constraintEnd_toStartOf="@+id/seek_bar_speed"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/seek_bar_speed" />
+
+    <SeekBar
+            android:id="@+id/seek_bar_speed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:max="100"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="85"
+            app:layout_constraintStart_toEndOf="@+id/text_speed"
+            app:layout_constraintTop_toBottomOf="@+id/button_down" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

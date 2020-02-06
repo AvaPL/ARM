@@ -21,6 +21,7 @@
 
     <string name="text_release">RELEASE</string>
     <string name="text_grab">GRAB</string>
+    <string name="text_speed">SPEED</string>
 
     <string name="text_bluetooth_disabled">Bluetooth is disabled.</string>
     <string name="text_connected">Connected</string>

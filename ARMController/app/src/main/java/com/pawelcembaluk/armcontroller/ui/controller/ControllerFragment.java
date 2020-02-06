@@ -269,10 +269,14 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     @SuppressLint("ClickableViewAccessibility")
     private void setOnTouchListeners() {
         int delay = getDelay();
-        up.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("forward", delay));
-        down.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("back", delay));
-        left.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("left", delay));
-        right.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("right", delay));
+        up.setOnTouchListener(
+                OnTouchListenerFactory.getRepeatCommandListener("forward", delay, "stop"));
+        down.setOnTouchListener(
+                OnTouchListenerFactory.getRepeatCommandListener("back", delay, "stop"));
+        left.setOnTouchListener(
+                OnTouchListenerFactory.getRepeatCommandListener("left", delay, "stop"));
+        right.setOnTouchListener(
+                OnTouchListenerFactory.getRepeatCommandListener("right", delay, "stop"));
     }
 
     private int getDelay() {
