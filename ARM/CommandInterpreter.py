@@ -36,14 +36,26 @@ class CommandInterpreter:
             self.sendJoints()
         elif command == "grab":
             self.sendGrab()
+        elif command == "speed":
+            self.sendSpeed()
         elif command == "kinematics":
             self.sendKinematics()
-        elif self.isNavigationCommand(command):
-            pass  # TODO: Implement movement.
+        elif command == "forward":
+            self.mobilePlatform.forward()
+        elif command == "back":
+            self.mobilePlatform.back()
+        elif command == "left":
+            self.mobilePlatform.left()
+        elif command == "right":
+            self.mobilePlatform.right()
+        elif command == "stop":
+            self.mobilePlatform.stop()
         elif splitCommand[0] == "angle":
             self.changeAngle(splitCommand)
         elif splitCommand[0] == "coordinate":
             self.changeCoordinates(splitCommand)
+        elif splitCommand[0] == "speed":
+            self.changeSpeed(splitCommand)
         else:
             self.sendUnknownCommand()
 
@@ -63,6 +75,13 @@ class CommandInterpreter:
         servoIndex = self.arm.servoNumber - 1
         angle = round(self.arm.getAngle(servoIndex))
         return "angle grab " + str(angle)
+
+    def sendSpeed(self):
+        self.bluetoothConnection.writeData(self.getSpeedCommand())
+
+    def getSpeedCommand(self):
+        speed = self.mobilePlatform.speed
+        return "speed " + str(speed)
 
     def sendKinematics(self):
         coordinates = self.arm.kinematics.getCorrectedKinematics()
@@ -93,6 +112,10 @@ class CommandInterpreter:
             self.arm.changeCoordinates(coordinate, value)
         except NotReachableException:
             self.sendKinematics()
+
+    def changeSpeed(self, splitCommand):
+        speed = int(splitCommand[1])
+        self.mobilePlatform.setSpeed(speed)
 
     def sendUnknownCommand(self):
         self.bluetoothConnection.writeData("Unknown command")

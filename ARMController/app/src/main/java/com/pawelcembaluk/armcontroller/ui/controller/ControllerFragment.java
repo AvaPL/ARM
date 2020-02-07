@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,13 +26,12 @@ import com.pawelcembaluk.armcontroller.ui.controller.listeners.OnSeekBarChangeLi
 import com.pawelcembaluk.armcontroller.ui.controller.listeners.OnTouchListenerFactory;
 import com.pawelcembaluk.armcontroller.ui.settings.SettingsFragment;
 
-import java.util.Arrays;
-
 public class ControllerFragment extends Fragment implements ConnectionObserver, DataReceivedObserver {
 
     private static final String SHARED_PREFERENCES_ANGLES = "angles";
     private static final String KEY_JOINT_VALUE = "joint_value";
     private static final String KEY_GRAB_VALUE = "grab_value";
+    private static final String KEY_SPEED_VALUE = "speed_value";
     private static final String SHARED_PREFERENCES_KINEMATICS = "kinematics";
     private static final String KEY_POSITION_X = "position_x";
     private static final String KEY_POSITION_Y = "position_y";
@@ -45,6 +43,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     private SharedPreferences angles;
     private SeekBar[] jointSeekBars = new SeekBar[3];
     private SeekBar grabSeekBar;
+    private SeekBar speedSeekBar;
     private TextView[] jointTextViews = new TextView[3];
 
     private SharedPreferences kinematics;
@@ -94,6 +93,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         else
             BluetoothConnection.getInstance().send("kinematics");
         BluetoothConnection.getInstance().send("grab");
+        BluetoothConnection.getInstance().send("speed");
     }
 
     @Override
@@ -114,7 +114,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     }
 
     private void initializeAnglesView() {
-        initializeSeekBars();
+        initializeAnglesSeekBars();
         initializeJointTextViews();
         initializeAnglesSharedPreferences();
         loadAnglesState();
@@ -122,17 +122,23 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         setAnglesListeners();
     }
 
-    private void initializeSeekBars() {
+    private void initializeAnglesSeekBars() {
         if (getView() == null) return;
         jointSeekBars[0] = getView().findViewById(R.id.seek_bar_joint_0);
         jointSeekBars[1] = getView().findViewById(R.id.seek_bar_joint_1);
         jointSeekBars[2] = getView().findViewById(R.id.seek_bar_joint_2);
         initializeGrabSeekBar();
+        initializeSpeedSeekBar();
     }
 
     private void initializeGrabSeekBar() {
         if (getView() == null) return;
         grabSeekBar = getView().findViewById(R.id.seek_bar_grab);
+    }
+
+    private void initializeSpeedSeekBar() {
+        if (getView() == null) return;
+        speedSeekBar = getView().findViewById(R.id.seek_bar_speed);
     }
 
     private void initializeJointTextViews() {
@@ -155,6 +161,8 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         }
         int grabValue = angles.getInt(KEY_GRAB_VALUE, 0);
         grabSeekBar.setProgress(grabValue);
+        int speedValue = angles.getInt(KEY_SPEED_VALUE, 100);
+        speedSeekBar.setProgress(speedValue);
     }
 
     private void setJointsTexts() {
@@ -165,6 +173,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     private void setAnglesListeners() {
         setJointListeners();
         setGrabListener();
+        setSpeedListener();
     }
 
     private void setJointListeners() {
@@ -189,13 +198,25 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         grabSeekBar.setOnSeekBarChangeListener(listener);
     }
 
+    private void setSpeedListener() {
+        SeekBar.OnSeekBarChangeListener listener =
+                OnSeekBarChangeListenerFactory.getSpeedListener();
+        speedSeekBar.setOnSeekBarChangeListener(listener);
+    }
+
     private void initializeDhView() {
         initializeKinematicsTextViews();
         initializeKinematicsButtons();
-        initializeGrabSeekBar();
-        setGrabListener();
+        initializeDhSeekBars();
         initializeKinematicsSharedPreferences();
         loadKinematicsState();
+    }
+
+    private void initializeDhSeekBars() {
+        initializeGrabSeekBar();
+        initializeSpeedSeekBar();
+        setGrabListener();
+        setSpeedListener();
     }
 
     private void initializeKinematicsTextViews() {
@@ -255,6 +276,8 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
                 kinematics.getString(KEY_ANGLE_PHI, getString(R.string.text_default_int_value)));
         int grabValue = kinematics.getInt(KEY_GRAB_VALUE, 0);
         grabSeekBar.setProgress(grabValue);
+        int speedValue = kinematics.getInt(KEY_SPEED_VALUE, 100);
+        speedSeekBar.setProgress(speedValue);
     }
 
     private void initializeMovementButtons() {
@@ -269,10 +292,14 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
     @SuppressLint("ClickableViewAccessibility")
     private void setOnTouchListeners() {
         int delay = getDelay();
-        up.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("forward", delay));
-        down.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("back", delay));
-        left.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("left", delay));
-        right.setOnTouchListener(OnTouchListenerFactory.getRepeatCommandListener("right", delay));
+        up.setOnTouchListener(
+                OnTouchListenerFactory.getRepeatCommandListener("forward", delay, "stop"));
+        down.setOnTouchListener(
+                OnTouchListenerFactory.getRepeatCommandListener("back", delay, "stop"));
+        left.setOnTouchListener(
+                OnTouchListenerFactory.getRepeatCommandListener("left", delay, "stop"));
+        right.setOnTouchListener(
+                OnTouchListenerFactory.getRepeatCommandListener("right", delay, "stop"));
     }
 
     private int getDelay() {
@@ -319,6 +346,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         for (int i = 0; i < jointSeekBars.length; ++i)
             anglesEditor.putInt(KEY_JOINT_VALUE + "_" + i, jointSeekBars[i].getProgress());
         anglesEditor.putInt(KEY_GRAB_VALUE, grabSeekBar.getProgress());
+        anglesEditor.putInt(KEY_SPEED_VALUE, speedSeekBar.getProgress());
         anglesEditor.apply();
     }
 
@@ -329,6 +357,7 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
         kinematicsEditor.putString(KEY_POSITION_Y, yPositionTextView.getText().toString());
         kinematicsEditor.putString(KEY_ANGLE_PHI, phiAngleTextView.getText().toString());
         kinematicsEditor.putInt(KEY_GRAB_VALUE, grabSeekBar.getProgress());
+        kinematicsEditor.putInt(KEY_SPEED_VALUE, speedSeekBar.getProgress());
         kinematicsEditor.apply();
     }
 
@@ -359,6 +388,8 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
             setAngle(commandSplit);
         else if (commandSplit[0].equals("coordinate"))
             setCoordinate(commandSplit);
+        else if (commandSplit[0].equals("speed"))
+            setSpeed(commandSplit);
         else
             Toast.makeText(getContext(), command.trim(), Toast.LENGTH_SHORT).show();
     }
@@ -386,5 +417,10 @@ public class ControllerFragment extends Fragment implements ConnectionObserver, 
             yPositionTextView.setText(value);
         else
             phiAngleTextView.setText(value);
+    }
+
+    private void setSpeed(String[] commandSplit) {
+        int speed = Integer.parseInt(commandSplit[1]);
+        speedSeekBar.setProgress(speed);
     }
 }

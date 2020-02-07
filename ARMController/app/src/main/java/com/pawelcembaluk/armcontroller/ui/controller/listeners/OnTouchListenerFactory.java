@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.pawelcembaluk.armcontroller.bluetooth.BluetoothConnection;
 
+import java.util.Optional;
 import java.util.function.IntUnaryOperator;
 
 public class OnTouchListenerFactory {
@@ -16,11 +17,20 @@ public class OnTouchListenerFactory {
         private final Handler handler = new Handler();
         private final View.OnClickListener clickListener;
         private final int intervalMillis;
+        private final Optional<View.OnClickListener> releaseListener;
         private View touchedView;
 
         public RepeatListener(View.OnClickListener clickListener, int intervalMillis) {
             this.clickListener = clickListener;
             this.intervalMillis = intervalMillis;
+            this.releaseListener = Optional.empty();
+        }
+
+        public RepeatListener(View.OnClickListener clickListener, int intervalMillis,
+                              View.OnClickListener releaseListener) {
+            this.clickListener = clickListener;
+            this.intervalMillis = intervalMillis;
+            this.releaseListener = Optional.of(releaseListener);
         }
 
         @Override
@@ -45,6 +55,8 @@ public class OnTouchListenerFactory {
         }
 
         private boolean onRelease() {
+            if (releaseListener.isPresent())
+                releaseListener.get().onClick(touchedView);
             stop();
             return true;
         }
@@ -69,9 +81,12 @@ public class OnTouchListenerFactory {
         }
     }
 
-    public static View.OnTouchListener getRepeatCommandListener(String command, int delayMillis) {
+    public static View.OnTouchListener getRepeatCommandListener(String command, int delayMillis,
+                                                                String releaseCommand) {
         View.OnClickListener onClick = view -> BluetoothConnection.getInstance().send(command);
-        return new RepeatListener(onClick, delayMillis);
+        View.OnClickListener onRelease =
+                view -> BluetoothConnection.getInstance().send(releaseCommand);
+        return new RepeatListener(onClick, delayMillis, onRelease);
     }
 
     public static View.OnTouchListener getIncrementCoordinateListener(String coordinate,
