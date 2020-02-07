@@ -54,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.75" />
+            app:layout_constraintGuide_percent="0.7" />
 
     <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_vertical"
@@ -270,6 +270,36 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/seek_bar_grab"
             app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+            android:id="@+id/text_speed"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="32dp"
+            android:outlineProvider="bounds"
+            android:text="@string/text_speed"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/seek_bar_speed"
+            app:layout_constraintEnd_toStartOf="@+id/seek_bar_speed"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/seek_bar_speed" />
+
+    <SeekBar
+            android:id="@+id/seek_bar_speed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:max="100"
+            android:progress="100"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="85"
+            app:layout_constraintStart_toEndOf="@+id/text_speed"
+            app:layout_constraintTop_toBottomOf="@+id/button_down" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

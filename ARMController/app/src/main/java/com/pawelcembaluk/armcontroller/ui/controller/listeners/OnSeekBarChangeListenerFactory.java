@@ -53,6 +53,22 @@ public class OnSeekBarChangeListenerFactory {
         }
     }
 
+    private static class SpeedSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            BluetoothConnection.getInstance().send("speed " + i);
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
+    }
+
     private static class ComplexSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
 
         private SeekBar.OnSeekBarChangeListener[] listeners;
@@ -86,6 +102,10 @@ public class OnSeekBarChangeListenerFactory {
 
     public static SeekBar.OnSeekBarChangeListener getServoListener(int servoIndex) {
         return new ServoSeekBarChangeListener(servoIndex);
+    }
+
+    public static SeekBar.OnSeekBarChangeListener getSpeedListener() {
+        return new SpeedSeekBarChangeListener();
     }
 
     public static SeekBar.OnSeekBarChangeListener getComplexListener(

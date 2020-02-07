@@ -33,9 +33,9 @@
             android:layout_height="@dimen/dpad_size_button"
             android:layout_marginEnd="@dimen/dpad_spacing"
             android:contentDescription="@string/image_description_left_arrow"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/button_down"
             app:layout_constraintEnd_toStartOf="@+id/guideline_vertical"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_up"
             app:srcCompat="@drawable/ic_controller_arrow_left" />
 
     <ImageButton
@@ -44,9 +44,9 @@
             android:layout_height="@dimen/dpad_size_button"
             android:layout_marginStart="@dimen/dpad_spacing"
             android:contentDescription="@string/image_description_right_arrow"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/button_down"
             app:layout_constraintStart_toStartOf="@+id/guideline_vertical"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_up"
             app:srcCompat="@drawable/ic_controller_arrow_right" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -72,7 +72,6 @@
             app:layout_constraintEnd_toStartOf="@+id/button_dh_up_y"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/button_right"
-            app:layout_constraintTop_toTopOf="@+id/guideline_navigation"
             app:srcCompat="@drawable/ic_controller_dh_arrow_up" />
 
     <ImageButton
@@ -80,12 +79,46 @@
             android:layout_width="@dimen/dh_size_button"
             android:layout_height="@dimen/dh_size_button"
             android:contentDescription="@string/image_description_down_arrow"
-            app:layout_constraintBottom_toTopOf="@+id/guideline_navigation"
             app:layout_constraintEnd_toStartOf="@+id/button_dh_down_y"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/button_right"
             app:layout_constraintTop_toBottomOf="@+id/text_position_x_value"
             app:srcCompat="@drawable/ic_controller_dh_arrow_down" />
+
+    <ImageButton
+            android:id="@+id/button_dh_down_y"
+            android:layout_width="@dimen/dh_size_button"
+            android:layout_height="@dimen/dh_size_button"
+            android:contentDescription="@string/image_description_down_arrow"
+            app:layout_constraintEnd_toStartOf="@+id/button_dh_down_phi"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/button_dh_down_x"
+            app:layout_constraintTop_toBottomOf="@+id/text_position_y_value"
+            app:srcCompat="@drawable/ic_controller_dh_arrow_down" />
+
+    <TextView
+            android:id="@+id/text_position_y_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_default_int_value"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            app:layout_constraintEnd_toEndOf="@+id/button_dh_down_y"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/button_dh_down_y"
+            app:layout_constraintTop_toBottomOf="@+id/text_position_y" />
+
+    <TextView
+            android:id="@+id/text_position_y"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_position_y"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline_navigation"
+            app:layout_constraintEnd_toEndOf="@+id/button_dh_up_y"
+            app:layout_constraintStart_toStartOf="@+id/button_dh_up_y"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
             android:id="@+id/button_dh_up_y"
@@ -96,20 +129,7 @@
             app:layout_constraintEnd_toStartOf="@+id/button_dh_up_phi"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/button_dh_up_x"
-            app:layout_constraintTop_toTopOf="@+id/guideline_navigation"
             app:srcCompat="@drawable/ic_controller_dh_arrow_up" />
-
-    <ImageButton
-            android:id="@+id/button_dh_down_y"
-            android:layout_width="@dimen/dh_size_button"
-            android:layout_height="@dimen/dh_size_button"
-            android:contentDescription="@string/image_description_down_arrow"
-            app:layout_constraintBottom_toTopOf="@+id/guideline_navigation"
-            app:layout_constraintEnd_toStartOf="@+id/button_dh_down_phi"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/button_dh_down_x"
-            app:layout_constraintTop_toBottomOf="@+id/text_position_y_value"
-            app:srcCompat="@drawable/ic_controller_dh_arrow_down" />
 
     <ImageButton
             android:id="@+id/button_dh_up_phi"
@@ -120,7 +140,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/button_dh_up_y"
-            app:layout_constraintTop_toTopOf="@+id/guideline_navigation"
             app:srcCompat="@drawable/ic_controller_dh_arrow_up" />
 
     <ImageButton
@@ -128,7 +147,6 @@
             android:layout_width="@dimen/dh_size_button"
             android:layout_height="@dimen/dh_size_button"
             android:contentDescription="@string/image_description_down_arrow"
-            app:layout_constraintBottom_toTopOf="@+id/guideline_navigation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/button_dh_down_y"
@@ -142,11 +160,11 @@
             android:text="@string/text_position_x"
             android:textAlignment="center"
             android:textSize="30sp"
-            app:layout_constraintBottom_toTopOf="@+id/text_position_x_value"
+            app:layout_constraintBottom_toTopOf="@+id/guideline_navigation"
             app:layout_constraintEnd_toEndOf="@+id/button_dh_up_x"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.485"
             app:layout_constraintStart_toStartOf="@+id/button_dh_up_x"
-            app:layout_constraintTop_toBottomOf="@+id/button_dh_up_x" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
             android:id="@+id/text_position_x_value"
@@ -155,37 +173,10 @@
             android:text="@string/text_default_int_value"
             android:textAlignment="center"
             android:textSize="30sp"
-            app:layout_constraintBottom_toTopOf="@+id/button_dh_down_x"
             app:layout_constraintEnd_toEndOf="@+id/button_dh_down_x"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/button_dh_down_x"
             app:layout_constraintTop_toBottomOf="@+id/text_position_x" />
-
-    <TextView
-            android:id="@+id/text_position_y"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/text_position_y"
-            android:textAlignment="center"
-            android:textSize="30sp"
-            app:layout_constraintBottom_toTopOf="@+id/text_position_y_value"
-            app:layout_constraintEnd_toEndOf="@+id/button_dh_up_y"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/button_dh_up_y"
-            app:layout_constraintTop_toBottomOf="@+id/button_dh_up_y" />
-
-    <TextView
-            android:id="@+id/text_position_y_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/text_default_int_value"
-            android:textAlignment="center"
-            android:textSize="30sp"
-            app:layout_constraintBottom_toTopOf="@+id/button_dh_down_y"
-            app:layout_constraintEnd_toEndOf="@+id/button_dh_down_y"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/button_dh_down_y"
-            app:layout_constraintTop_toBottomOf="@+id/text_position_y" />
 
     <TextView
             android:id="@+id/text_angle_phi"
@@ -194,11 +185,11 @@
             android:text="@string/text_angle_phi"
             android:textAlignment="center"
             android:textSize="30sp"
-            app:layout_constraintBottom_toTopOf="@+id/text_angle_phi_value"
+            app:layout_constraintBottom_toTopOf="@+id/guideline_navigation"
             app:layout_constraintEnd_toEndOf="@+id/button_dh_up_phi"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/button_dh_up_phi"
-            app:layout_constraintTop_toBottomOf="@+id/button_dh_up_phi" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
             android:id="@+id/text_angle_phi_value"
@@ -207,7 +198,6 @@
             android:text="@string/text_default_int_value"
             android:textAlignment="center"
             android:textSize="30sp"
-            app:layout_constraintBottom_toTopOf="@+id/button_dh_down_phi"
             app:layout_constraintEnd_toEndOf="@+id/button_dh_down_phi"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/button_dh_down_phi"
@@ -252,12 +242,43 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:max="180"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/seek_bar_speed"
             app:layout_constraintEnd_toStartOf="@+id/text_grab"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintHorizontal_weight="30"
             app:layout_constraintStart_toEndOf="@+id/text_release"
             app:layout_constraintTop_toBottomOf="@+id/button_dh_down_y" />
+
+    <TextView
+            android:id="@+id/text_speed"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:outlineProvider="bounds"
+            android:text="@string/text_speed"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/seek_bar_speed"
+            app:layout_constraintEnd_toStartOf="@+id/seek_bar_speed"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="10"
+            app:layout_constraintStart_toEndOf="@+id/button_right"
+            app:layout_constraintTop_toTopOf="@+id/seek_bar_speed" />
+
+    <SeekBar
+            android:id="@+id/seek_bar_speed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="100"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/seek_bar_grab"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="40"
+            app:layout_constraintStart_toStartOf="@+id/seek_bar_grab"
+            app:layout_constraintTop_toBottomOf="@+id/seek_bar_grab" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,7 +12,7 @@
     <string name="preference_title_continuous_commands_delay">Continuous commands delay</string>
     <string name="preference_key_build_version">build_version</string>
     <string name="preference_title_build_version">Build version</string>
-    <string name="preference_summary_build_version">0.0.1</string>
+    <string name="preference_summary_build_version">0.6.2</string>
 
     <string name="image_description_down_arrow">Down arrow</string>
     <string name="image_description_right_arrow">Right arrow</string>
