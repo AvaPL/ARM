@@ -32,8 +32,7 @@ commandInterpreter = CommandInterpreter(bluetoothConnection, arm, mobilePlatform
 
 def shutdown():
     cleanup()
-    print("Shutdown...")  # TODO: Remove, debug only.
-    # subprocess.call("sudo shutdown -h now", shell=True) TODO: Uncomment, debug only.
+    subprocess.call("sudo shutdown -h now", shell=True)
 
 
 def cleanup():

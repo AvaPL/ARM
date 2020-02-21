@@ -21,8 +21,8 @@ def shutdown():
 def callShutdownSubprocess():
     for i in range(5):
         blinkLed(activityLedPin, onTimeMillis=100, offTimeMillis=100)
-    # GPIO.cleanup()
-    # subprocess.call("sudo shutdown -h now", shell=True) TODO: Uncomment, debug only.
+    GPIO.cleanup()
+    subprocess.call("sudo shutdown -h now", shell=True)
 
 
 shutdownThread = Thread(target=shutdown, daemon=True)
