@@ -1,0 +1,12 @@
+[Unit]
+Description=ARM - Bluetooth-controlled robotic arm
+After=bluetooth.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/Projects/PyCharm/ARM/Main.py
+StandardOutput=file:/home/pi/Projects/PyCharm/ARM/ARM.out.log
+StandardError=file:/home/pi/Projects/PyCharm/ARM/ARM.err.log
+
+[Install]
+WantedBy=bluetooth.target

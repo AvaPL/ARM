@@ -15,6 +15,10 @@ initialAngles = [160, 110, 150, 90]
 arm = Arm(servoNumber, pulseWidths, initialAngles)
 
 GPIO.setmode(GPIO.BCM)
+
+connectionAvailablePin = 20
+GPIO.setup(connectionAvailablePin, GPIO.OUT)
+
 leftMotorPWMPin = 12
 leftMotorDirectionPin = 5
 rightMotorPWMPin = 13
@@ -25,19 +29,25 @@ mobilePlatform = MobilePlatform(leftMotor, rightMotor)
 
 commandInterpreter = CommandInterpreter(bluetoothConnection, arm, mobilePlatform)
 
+
 def shutdown():
+    cleanup()
+    subprocess.call("sudo shutdown -h now", shell=True)
+
+
+def cleanup():
     bluetoothConnection.close()
     mobilePlatform.stop()
     GPIO.cleanup()
-    # subprocess.call("sudo shutdown -h now", shell=True) TODO: Uncomment, debug only.
 
 
 try:
     shutdownReceived = False
-    while not shutdownReceived: # Establish a new connection if the client disconnected.
+    while not shutdownReceived:  # Establish a new connection if the client disconnected.
+        GPIO.output(connectionAvailablePin, GPIO.HIGH)
         bluetoothConnection.establish()
+        GPIO.output(connectionAvailablePin, GPIO.LOW)
         shutdownReceived = commandInterpreter.readCommands()
+    shutdown()
 except:
-    pass
-finally:
-    shutdown() # TODO: System shouldn't be always shut down eg. service restart.
+    cleanup()

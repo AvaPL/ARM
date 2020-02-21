@@ -1,0 +1,12 @@
+[Unit]
+Description=Signals system activity via led diode and provides a way of manual shutdown.
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/Projects/PyCharm/ARM/support/SystemActivity.py
+StandardOutput=file:/home/pi/Projects/PyCharm/ARM/support/SystemActivity.out.log
+StandardError=file:/home/pi/Projects/PyCharm/ARM/support/SystemActivity.err.log
+
+[Install]
+WantedBy=multi-user.target
