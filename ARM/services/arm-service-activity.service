@@ -1,0 +1,12 @@
+[Unit]
+Description=Signals arm.service activity via led diode and provides a way of manual restart.
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/Projects/PyCharm/ARM/support/ARMServiceActivity.py
+StandardOutput=file:/home/pi/Projects/PyCharm/ARM/support/ARMServiceActivity.out.log
+StandardError=file:/home/pi/Projects/PyCharm/ARM/support/ARMServiceActivity.err.log
+
+[Install]
+WantedBy=multi-user.target
