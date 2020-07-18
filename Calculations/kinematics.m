@@ -14,8 +14,9 @@ A32 = [cos(phi3) -sin(phi3), 0, l*cos(phi3);
     sin(phi3), cos(phi3), 0, l*sin(phi3);
     0, 0, 1, 0;
     0, 0, 0, 1];
-A30 = A10*A21*A32;
-k = simplify([A30(1:2, 4); q3]);
+A30 = simplify(A10*A21*A32);
+display(A30)
+k = [A30(1:2, 4); q3];
 display(k);
 J = simplify([diff(k, q1), diff(k, q2), diff(k, q3)]);
 display(J);

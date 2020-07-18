@@ -1,5 +1,13 @@
 >> kinematics
  
+A30 =
+ 
+[ -cos(q1 + q2 + q3), -sin(q1 + q2 + q3), 0, a*sin(q1 + q2 - theta) + a*sin(q1 - theta) - l*cos(q1 + q2 + q3)]
+[  sin(q1 + q2 + q3), -cos(q1 + q2 + q3), 0, a*cos(q1 + q2 - theta) + a*cos(q1 - theta) + l*sin(q1 + q2 + q3)]
+[                  0,                  0, 1,                                                                0]
+[                  0,                  0, 0,                                                                1]
+ 
+ 
 k =
  
  a*sin(q1 + q2 - theta) + a*sin(q1 - theta) - l*cos(q1 + q2 + q3)
