@@ -6,6 +6,7 @@ lenE = 147;
 
 xi = 0.01:0.01:3;
 averageIterations = zeros(1, length(xi));
+divergentCalculations = zeros(1, length(xi));
 
 for i = 1:length(xi)
     for repeat = 1:1000
@@ -21,15 +22,22 @@ for i = 1:length(xi)
             k = calculateKinematics(q, theta, a, lenE);
             iterations = iterations + 1;
         end
-        averageIterations(i) = (averageIterations(i)*(repeat-1) + iterations)/repeat;
+        if iterations ~= 1000
+            averageIterations(i) = averageIterations(i) + (iterations - averageIterations(i))/(repeat + 1 - divergentCalculations(i));
+        else
+            divergentCalculations(i) = divergentCalculations(i) + 1;
+        end
     end
 end
 
 plot(xi, averageIterations);
 xlabel('\xi');
-ylabel('iterations');
+hold on;
+plot(xi, divergentCalculations);
+xlabel('\xi');
 grid on;
 grid minor;
+legend('iterations', 'divergent calculations')
 
 function k = calculateKinematics(q, theta, a, lenE)
     k = [a*sin(q(1) + q(2) - theta) + a*sin(q(1) - theta) - lenE*cos(q(1) + q(2) + q(3));
