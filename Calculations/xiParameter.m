@@ -4,7 +4,7 @@ theta = atan(len1/len2);
 a = sqrt(len1^2+len2^2);
 lenE = 147;
 
-xi = 0.01:0.01:1.3;
+xi = 0.01:0.01:3;
 averageIterations = zeros(1, length(xi));
 
 for i = 1:length(xi)
