@@ -19,6 +19,6 @@ Main features:
 ## Pictures and screenshots
 
 | <img src="Images/arm.jpg"> |
-|:------------------------------------:|:---------------------------------:|
+|:------------------------------------:|
 | <img src="Images/controller.png"> |
 | <img src="Images/menus.png"> |
