@@ -1,5 +1,5 @@
 # ARM
-ARM is a mobile robotic arm controlled by an Android app. This project is a subject of my BSc thesis.
+ARM is a mobile robotic arm controlled by an Android app. This project is the subject of my BSc thesis.
 
 Main features:
 * controlled via Bluetooth
